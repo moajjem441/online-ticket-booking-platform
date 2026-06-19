@@ -10,25 +10,22 @@ import {
 import Link from "next/link";
 import { FaBus } from "react-icons/fa";
 import { HiChevronDown, HiMenu, HiX } from "react-icons/hi";
-import { ThemeToggleButton } from "./ThemeToggleButton";
+import ThemeToggleButton from "./ThemeToggleButton";
 
 export default function AppNavbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // সেশন ডেটা সিমুলেশন (আপনার Auth Provider থেকে আসা আসল session অবজেক্টটি এখানে বসাবেন)
-  // লগআউট মোড টেস্ট করতে এটিকে `null` করে দেখতে পারেন।
+  // সেশন ডেটা সিমুলেশন (আপনার অথেন্টিকেশন সিস্টেম থেকে বাস্তব session দিন)
   const session = {
     user: {
       name: "John Doe",
       email: "john@ticketbari.com",
-      image: "https://img.heroui.chat/image/avatar?w=400&h=400&u=3", // ইমেজ না থাকলে এটি null বা ফাকা স্ট্রিং হতে পারে
+      image: "https://img.heroui.chat/image/avatar?w=400&h=400&u=3",
     }
   };
 
-  // সেশন উপস্থিত থাকলে ইউজারকে লগইন হিসেবে ধরা হবে
   const isLoggedIn = !!session?.user;
 
-  // সেশনের নামের প্রথম দুটি বা একটি অক্ষর দিয়ে ফলব্যাক টেক্সট তৈরি (যেমন: John Doe -> JD)
   const getFallbackText = (name) => {
     if (!name) return "U";
     return name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
@@ -42,10 +39,9 @@ export default function AppNavbar() {
 
   return (
     <div className="w-full px-4 pt-6 fixed top-0 z-50 max-w-7xl mx-auto left-0 right-0">
-      {/* মূল ডার্ক গ্লাস কনটেইনার */}
       <nav className="flex items-center justify-between bg-neutral-900/40 backdrop-blur-md border border-neutral-800 rounded-2xl h-20 px-6 shadow-2xl transition-all duration-300">
         
-        {/* বাম পাশ: মোবাইল মেনু এবং পিওর CSS টেক্সট লোগো */}
+        {/* বাম পাশ: লোগো ও মোবাইল মেনু টগল */}
         <div className="flex items-center gap-3">
           <button 
             onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -66,7 +62,7 @@ export default function AppNavbar() {
           </Link>
         </div>
 
-        {/* মাঝের অংশ: ডেক্সটপ নেভিগেশন লিংকসমূহ */}
+        {/* মাঝের অংশ: ডেক্সটপ নেভিগেশন */}
         <div className="hidden sm:flex items-center gap-6">
           <Link href="/" className="text-neutral-300 hover:text-white text-sm font-medium transition-colors">
             Home
@@ -81,26 +77,23 @@ export default function AppNavbar() {
           )}
         </div>
 
-        {/* ডান পাশ: সেশন ভিত্তিক কন্ডিশনাল ইউজার ড্রপডাউন বা সাইন ইন বাটন */}
+        {/* ডান পাশ: থিম টগল + ইউজার ড্রপডাউন / সাইন-ইন */}
         <div className="flex items-center gap-4">
+          
+          {/* ✅ থিম টগল বাটন – ড্রপডাউনের বাইরে */}
+          <ThemeToggleButton />
+
           {isLoggedIn ? (
             <Dropdown placement="bottom-end" className="bg-neutral-900 border border-neutral-800 text-white">
               <DropdownTrigger>
+                {/* ✅ এখানে শুধু ড্রপডাউন ট্রিগার, কোনো নেস্টেড বাটন নেই */}
                 <div className="flex items-center gap-2 py-1.5 px-3 rounded-full hover:bg-neutral-800/50 cursor-pointer border border-neutral-800/40 transition-all">
-                  
-
-               <div>
-                <ThemeToggleButton></ThemeToggleButton>
-               </div>
-
-                  {/* HeroUI v3 এর নতুন অবজেক্ট ভিত্তিক অ্যাভাটার সিনট্যাক্স */}
                   <Avatar className="w-8 h-8 text-xs border border-blue-500/50">
                     {session.user.image ? (
                       <Avatar.Image alt={session.user.name} src={session.user.image} />
                     ) : null}
                     <Avatar.Fallback>{getFallbackText(session.user.name)}</Avatar.Fallback>
                   </Avatar>
-
                   <span className="hidden md:block text-sm font-medium text-neutral-200">
                     {session.user.name}
                   </span>
@@ -117,7 +110,6 @@ export default function AppNavbar() {
               </DropdownMenu>
             </Dropdown>
           ) : (
-            /* লগইন না থাকলে ডান পাশে সরাসরি সাইন-ইন বাটন বা লিংকে পাঠাবে */
             <Link 
               href="/login" 
               className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium px-5 py-2.5 rounded-xl shadow-lg shadow-indigo-600/20 hover:opacity-90 transition-all text-sm block"
@@ -128,7 +120,7 @@ export default function AppNavbar() {
         </div>
       </nav>
 
-      {/* মোবাইল ড্রয়ার ওভারলে মেনু */}
+      {/* মোবাইল ড্রয়ার মেনু */}
       {isMenuOpen && (
         <div className="sm:hidden absolute top-28 left-4 right-4 bg-neutral-950/95 backdrop-blur-lg rounded-2xl p-6 border border-neutral-800 shadow-2xl flex flex-col gap-4 animate-in fade-in slide-in-from-top-5 duration-200">
           {menuItems.map((item, index) => (

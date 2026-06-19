@@ -1,8 +1,8 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import AppNavbar from "@/components/Navbar";
+import NextThemeProviders from "@/providers/NextThemeProviders";
 
-import AppNavbar from "@/components/Navbar"; 
-import { Providers } from "./providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -21,23 +21,21 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html className="light" data-theme="light"
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-      suppressHydrationWarning // এটি এখানে ঠিক আছে
+    <html
+      lang="en" 
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`} // ✅ 'dark' সরানো হয়েছে
+      suppressHydrationWarning
     >
-      {/* ২. body থেকে ভুল suppressHydrationWarning ক্লাসটি মুছে ফেলা হয়েছে */}
       <body className="bg-background text-foreground min-h-full flex flex-col">
-        <Providers>
-          {/* ৩. এখানেও AppNavbar ট্যাগ ব্যবহার করা হয়েছে */}
-          <AppNavbar /> 
+    <NextThemeProviders>
 
-          {/* নেভবারটি যেহেতু fixed করা, তাই মেইন কন্টেন্ট যেন নেভবারের নিচে ঢুকে না যায়, 
-              সেজন্য main ট্যাগে সামান্য টপ প্যাডিং (pt-28) দেওয়া ভালো */}
-          <main className="flex-1 pt-28"> 
+      <AppNavbar />
+          <main className="flex-1 pt-28">
             {children}
           </main>
-        </Providers>
+    </NextThemeProviders>
+          
+       
       </body>
     </html>
   );
