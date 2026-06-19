@@ -61,46 +61,7 @@ export default function Banner() {
           </Button>
         </div>
 
-        {/* Instant Search Bar Container (Floating Glass Box) */}
-        <div className="w-full max-w-3xl mt-12 p-4 bg-neutral-900/40 backdrop-blur-md border border-neutral-800/80 rounded-2xl shadow-2xl flex flex-col md:flex-row gap-3 items-center">
-          
-          {/* Form Option 1: Journey From */}
-          <div className="w-full flex flex-col text-left px-3 py-1 border-r border-neutral-800/60 last:border-0 md:w-1/3">
-            <label className="text-xs text-neutral-500 font-medium uppercase tracking-wider mb-1">From</label>
-            <input 
-              type="text" 
-              placeholder="Departure City" 
-              className="bg-transparent text-white placeholder-neutral-600 focus:outline-none text-sm font-medium w-full"
-            />
-          </div>
-
-          {/* Form Option 2: Journey To */}
-          <div className="w-full flex flex-col text-left px-3 py-1 border-r border-neutral-800/60 last:border-0 md:w-1/3">
-            <label className="text-xs text-neutral-500 font-medium uppercase tracking-wider mb-1">To</label>
-            <input 
-              type="text" 
-              placeholder="Destination City" 
-              className="bg-transparent text-white placeholder-neutral-600 focus:outline-none text-sm font-medium w-full"
-            />
-          </div>
-
-          {/* Form Option 3: Date */}
-          <div className="w-full flex flex-col text-left px-3 py-1 md:w-1/3">
-            <label className="text-xs text-neutral-500 font-medium uppercase tracking-wider mb-1">Journey Date</label>
-            <input 
-              type="date" 
-              className="bg-transparent text-white placeholder-neutral-600 focus:outline-none text-sm font-medium w-full [color-scheme:dark]"
-            />
-          </div>
-
-          {/* Quick Search Trigger inside Form */}
-          <Button
-            size="lg"
-            className="w-full md:w-auto bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 text-white font-medium px-6 h-12 rounded-xl"
-          >
-            Search
-          </Button>
-        </div>
+      
 
         {/* Feature Triggers */}
         <div className="flex items-center gap-6 mt-6 text-xs md:text-sm text-neutral-500 font-medium">
