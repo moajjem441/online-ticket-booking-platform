@@ -1,6 +1,6 @@
 import { title, text, muted, buttonPrimary } from "@/styles/ui";
 
-// Unused imports removed
+
 const Loading = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-white dark:bg-neutral-900 transition-colors duration-300">
