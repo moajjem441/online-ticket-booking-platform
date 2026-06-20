@@ -12,12 +12,20 @@ import { FaBus } from "react-icons/fa";
 import { HiChevronDown, HiMenu, HiX } from "react-icons/hi";
 import ThemeToggleButton from "./ThemeToggleButton";
 import { authClient } from "@/lib/auth-client";
-import { useRouter } from "next/navigation";
+import { useRouter,usePathname } from "next/navigation";
+
+
 
 export default function AppNavbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
+
+  const pathname=usePathname();
+
+  if(pathname.includes("dashboard")){
+    return null;
+  }
 
   const { data: session, isPending } = authClient.useSession(); // isPending যোগ করুন
   const user = session?.user;
@@ -26,14 +34,14 @@ export default function AppNavbar() {
     setMounted(true);
   }, []);
 
-  // রিডাইরেক্ট শুধুমাত্র mounted && !isPending && !user হলে
+
   useEffect(() => {
     if (mounted && !isPending && !user) {
       router.push("/login");
     }
   }, [mounted, isPending, user, router]);
 
-  // ফallback টেক্সট
+
   const getFallbackText = (name) =>
     name ? name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2) : "U";
 
