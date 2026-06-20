@@ -141,7 +141,8 @@ export default function AppNavbar() {
                 </DropdownItem>
 
                 <DropdownItem key="logout" color="danger">
-                  Logout
+                  <Link href="/login"> Logout</Link>
+                 
                 </DropdownItem>
 
               </DropdownMenu>

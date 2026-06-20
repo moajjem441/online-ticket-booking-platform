@@ -4,8 +4,7 @@ import { Input, Button } from "@heroui/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FaBus, FaGoogle } from "react-icons/fa";
-// import { authClient } from "@/lib/auth-client";
-// আপনার ডিজাইন টোকেনসমূহ ইমপোর্ট করুন
+
 import { card, title, text, muted, buttonPrimary } from "@/styles/ui";
 import { authClient } from "@/lib/auth-client";
 
@@ -24,7 +23,9 @@ export default function RegisterPage() {
     const email = formData.get("email");
     const password = formData.get("password");
 
-    console.log(name, email, password);
+    // console.log(name, email, password);
+
+    
 
     const { data, error: authError } = await authClient.signUp.email({
       email,
