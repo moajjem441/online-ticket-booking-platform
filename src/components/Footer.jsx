@@ -5,7 +5,16 @@ import Link from "next/link";
 import { FaBus, FaFacebook, FaPhoneAlt, FaEnvelope } from "react-icons/fa";
 import { FaCcStripe, FaCcVisa, FaCcMastercard } from "react-icons/fa6";
 
+import { usePathname } from "next/navigation";
+
 export default function Footer() {
+
+  const pathname=usePathname();
+
+  if(pathname.includes("dashboard")){
+    return null;
+  }
+
   return (
     <footer className="w-full bg-white dark:bg-neutral-950 border-t border-gray-200 dark:border-neutral-900 text-gray-600 dark:text-neutral-400 pt-16 pb-8 px-6 mt-auto transition-colors duration-300">
 

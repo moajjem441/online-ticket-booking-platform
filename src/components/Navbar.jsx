@@ -12,39 +12,50 @@ import { FaBus } from "react-icons/fa";
 import { HiChevronDown, HiMenu, HiX } from "react-icons/hi";
 import ThemeToggleButton from "./ThemeToggleButton";
 import { authClient } from "@/lib/auth-client";
-import { useRouter,usePathname } from "next/navigation";
-
-
+import { useRouter, usePathname } from "next/navigation";
 
 export default function AppNavbar() {
+  // ============================================================
+  // 1️⃣ ALL HOOKS – called unconditionally, in the same order
+  // ============================================================
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
-
-  const pathname=usePathname();
-
-  if(pathname.includes("dashboard")){
-    return null;
-  }
-
-  const { data: session, isPending } = authClient.useSession(); // isPending যোগ করুন
+  const pathname = usePathname();
+  const { data: session, isPending } = authClient.useSession();
   const user = session?.user;
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-
   useEffect(() => {
+    // Only redirect after mounting and if session is known
     if (mounted && !isPending && !user) {
       router.push("/login");
     }
   }, [mounted, isPending, user, router]);
 
+  // ============================================================
+  // 2️⃣ CONDITIONAL RETURNS – after all hooks
+  // ============================================================
+  // If we're on a dashboard page, render nothing (but hooks are already called)
+  if (pathname?.includes("dashboard")) {
+    return null;
+  }
 
+  // ============================================================
+  // 3️⃣ COMPUTATIONS & HELPERS
+  // ============================================================
   const getFallbackText = (name) =>
-    name ? name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2) : "U";
-
+    name
+      ? name
+          .split(" ")
+          .map((n) => n[0])
+          .join("")
+          .toUpperCase()
+          .slice(0, 2)
+      : "U";
 
   const menuItems = [
     { label: "Home", href: "/" },
@@ -66,10 +77,13 @@ export default function AppNavbar() {
     transition-colors duration-300
   `.trim();
 
+  // ============================================================
+  // 4️⃣ JSX – render the navbar
+  // ============================================================
   return (
     <div className="w-full px-4 pt-6 fixed top-0 z-50 max-w-7xl mx-auto left-0 right-0">
       <nav className={navClasses}>
-        {/* LEFT - ঠিক আছে */}
+        {/* LEFT */}
         <div className="flex items-center gap-3">
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -89,7 +103,7 @@ export default function AppNavbar() {
           </Link>
         </div>
 
-        {/* CENTER - সার্ভার/ক্লায়েন্ট মিলিয়ে দিতে হবে */}
+        {/* CENTER */}
         <div className="hidden sm:flex items-center gap-6">
           <Link href="/" className="text-gray-700 dark:text-neutral-300 hover:text-black dark:hover:text-white transition">
             Home
@@ -97,7 +111,6 @@ export default function AppNavbar() {
           <Link href="/tickets" className="text-gray-700 dark:text-neutral-300 hover:text-black dark:hover:text-white transition">
             All Tickets
           </Link>
-          {/* Dashboard শুধু দেখাবেন যখন mounted && user true */}
           {mounted && user && (
             <Link href="/dashboard" className="text-gray-700 dark:text-neutral-300 hover:text-black dark:hover:text-white transition">
               Dashboard
@@ -105,11 +118,10 @@ export default function AppNavbar() {
           )}
         </div>
 
-        {/* RIGHT - মূল হাইড্রেশন ফিক্স */}
+        {/* RIGHT */}
         <div className="flex items-center gap-4">
           <ThemeToggleButton />
 
-          {/* যদি mounted false অথবা isPending true হয়, তাহলে সার্ভারের মতো Sign In দেখান */}
           {!mounted || isPending ? (
             <Link
               href="/login"
@@ -151,7 +163,7 @@ export default function AppNavbar() {
         </div>
       </nav>
 
-      {/* মোবাইল মেনু */}
+      {/* Mobile menu */}
       {isMenuOpen && (
         <div className="sm:hidden absolute top-28 left-4 right-4 bg-white dark:bg-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-2xl p-6 flex flex-col gap-4 shadow-xl">
           {menuItems.map((item) => (
