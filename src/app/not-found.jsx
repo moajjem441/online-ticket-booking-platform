@@ -1,21 +1,21 @@
 "use client";
 import React from 'react';
 import Link from 'next/link';
-// আপনার ডিজাইন টোকেনসমূহ ইমপোর্ট করুন
+
 import { title, text, muted, buttonPrimary } from "@/styles/ui";
 
 const NotFound = () => {
   return (
-    // bg-background ব্যবহার করা হয়েছে যাতে লেআউটের থিমের সাথে ব্যাকগ্রাউন্ড অটো-সিঙ্ক হয়
+   
     <div className="flex flex-col items-center justify-center min-h-[80vh] px-6 text-center transition-colors relative overflow-hidden">
       
-      {/* Background Glows (টিকিটবাড়ির ভাইব ফুটিয়ে তোলার জন্য) */}
+   
       <div className="absolute w-[300px] h-[300px] bg-blue-600/5 dark:bg-blue-600/10 rounded-full blur-[100px] top-1/4 left-1/4 pointer-events-none" />
       <div className="absolute w-[300px] h-[300px] bg-pink-600/5 dark:bg-pink-600/10 rounded-full blur-[100px] bottom-1/4 right-1/4 pointer-events-none" />
 
-      {/* 404 Number Design */}
+   
       <div className="relative z-10 select-none">
-        {/* ডার্ক মোডে টেক্সট যেন সাদা না হয়ে সুন্দর আবছা গ্রে থাকে, সেজন্য কাস্টম ক্লাস দেওয়া হয়েছে */}
+     
         <h1 className="text-9xl md:text-[12rem] font-black tracking-widest text-neutral-200 dark:text-neutral-800/60 drop-shadow-sm transition-colors">
           404
         </h1>
@@ -24,19 +24,17 @@ const NotFound = () => {
         </div>
       </div>
 
-      {/* Message */}
-      {/* ⚠️ এখানে title টোকেন ব্যবহার করা হয়েছে */}
+    
       <h2 className={`mt-10 text-3xl font-extrabold md:text-5xl tracking-tight ${title}`}>
         Page Not Found!
       </h2>
       
-      {/* ⚠️ এখানে text টোকেন ব্যবহার করা হয়েছে */}
+      
       <p className={`mt-4 text-base md:text-lg max-w-md mx-auto font-light leading-relaxed ${text}`}>
         Oops! The page you are looking for has been moved or doesn't exist. Let's get you back on track to booking your tickets.
       </p>
 
-      {/* Go Back Home Button */}
-      {/* ⚠️ এখানে buttonPrimary টোকেন ব্যবহার করা হয়েছে */}
+
       <Link
         href="/"
         className={`mt-8 inline-flex items-center justify-center px-8 py-3.5 text-base rounded-xl shadow-lg shadow-indigo-600/10 hover:opacity-95 transition-all duration-300 transform hover:-translate-y-0.5 ${buttonPrimary}`}
