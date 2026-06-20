@@ -8,10 +8,13 @@ import { FaBus, FaGoogle } from "react-icons/fa";
 import { card, title, text, muted, buttonPrimary } from "@/styles/ui";
 import { authClient } from "@/lib/auth-client";
 
+import {Label, ListBox, Select} from "@heroui/react";
+
 export default function RegisterPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const[role]=useState("user")
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,9 +24,10 @@ export default function RegisterPage() {
     const formData = new FormData(e.currentTarget);
     const name = formData.get("name");
     const email = formData.get("email");
+    const role = formData.get("role");
     const password = formData.get("password");
 
-    // console.log(name, email, password);
+    // console.log(name, email, password, role);
 
     
 
@@ -31,6 +35,7 @@ export default function RegisterPage() {
       email,
       password,
       name,
+      role,
       callbackURL: "/", 
     });
 
@@ -51,7 +56,7 @@ export default function RegisterPage() {
 // };
 
   return (
-    <div className="w-full min-h-[85vh] flex items-center justify-center px-4 relative transition-colors">
+    <div className="w-full min-h-[85vh] flex items-center justify-center px-4 relative transition-colors pt-20">
       {/* Background Glows (ডার্ক মোডে সুন্দর দেখানোর জন্য) */}
       <div className="absolute w-[400px] h-[400px] bg-purple-600/5 dark:bg-purple-600/10 rounded-full blur-[100px] top-1/4 left-1/4 pointer-events-none" />
       
@@ -100,6 +105,55 @@ export default function RegisterPage() {
             variant="bordered" 
             className={{ label: text, input: title }}
           />
+
+
+         
+
+
+     {/* <Select
+  className="w-full"
+  placeholder="Select a role"
+  name="role"   // ← এই name-টাই FormData-তে কাজ করবে
+  defaultSelectedKeys={["user"]}  // ← ডিফল্ট "User" সিলেক্ট করে দিতে (optional)
+>
+  <SelectItem key="user" textValue="User">User</SelectItem>
+  <SelectItem key="vendor" textValue="Vendor">Vendor</SelectItem>
+  <SelectItem key="admin" textValue="Admin">Admin</SelectItem>
+</Select> */}
+
+
+
+
+
+ <Select className="w-full]" placeholder="Select a role" name="role" defaultSelectedKeys={["user"]}
+ className={{ label: text, input: title }}
+ >
+      <Label>Role of User</Label>
+      <Select.Trigger>
+        <Select.Value />
+        <Select.Indicator />
+      </Select.Trigger>
+      <Select.Popover>
+        <ListBox>
+          
+         
+         
+          <ListBox.Item id="user" textValue="User">
+             User
+            <ListBox.ItemIndicator />
+          </ListBox.Item>
+          <ListBox.Item id="vendor" textValue="Vendor">
+            Vendor
+            <ListBox.ItemIndicator />
+          </ListBox.Item>
+
+        </ListBox>
+      </Select.Popover>
+    </Select>
+
+
+
+
           
           {/* ⚠️ প্রাইমারি বাটন টোকেন */}
           <Button 
