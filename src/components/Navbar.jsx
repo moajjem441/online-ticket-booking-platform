@@ -7,24 +7,34 @@ import {
   Dropdown,
   DropdownMenu,
   Avatar,
+  Button,
 } from "@heroui/react";
 import Link from "next/link";
 import { FaBus } from "react-icons/fa";
 import { HiChevronDown, HiMenu, HiX } from "react-icons/hi";
 import ThemeToggleButton from "./ThemeToggleButton";
 
+import { authClient } from "@/lib/auth-client"
+
+import { useRouter } from "next/navigation";
+
 export default function AppNavbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const session = {
-    user: {
-      name: "John Doe",
-      email: "john@ticketbari.com",
-      image: "https://img.heroui.chat/image/avatar?w=400&h=400&u=3",
-    },
-  };
+  const router = useRouter()
 
-  const isLoggedIn = !!session?.user;
+ 
+
+  const { data: session, error } =authClient.useSession()
+
+
+const user = session?.user;
+
+if(!user){
+  router.push("/login");
+  // return null;
+
+}
 
   const getFallbackText = (name) =>
     name ? name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2) : "U";
@@ -32,8 +42,15 @@ export default function AppNavbar() {
   const menuItems = [
     { label: "Home", href: "/" },
     { label: "All Tickets", href: "/tickets" },
-    ...(isLoggedIn ? [{ label: "Dashboard", href: "/dashboard" }] : []),
+    ...(user ? [{ label: "Dashboard", href: "/dashboard" }] : []),
   ];
+
+
+    const handleSignout=async()=>{
+   await authClient.signOut()
+    router.push("/login")
+  }
+
 
   return (
     <div className="w-full px-4 pt-6 fixed top-0 z-50 max-w-7xl mx-auto left-0 right-0">
@@ -85,7 +102,7 @@ export default function AppNavbar() {
             All Tickets
           </Link>
 
-          {isLoggedIn && (
+          {user && (
             <Link className="text-gray-700 dark:text-neutral-300 hover:text-black dark:hover:text-white transition" href="/dashboard">
               Dashboard
             </Link>
@@ -98,7 +115,7 @@ export default function AppNavbar() {
 
           <ThemeToggleButton />
 
-          {isLoggedIn ? (
+          {user ? (
             <Dropdown placement="bottom-end">
 
               <DropdownTrigger>
@@ -112,10 +129,10 @@ export default function AppNavbar() {
 
                   <Avatar className="w-8 h-8">
 
-                    {session.user.image && (
+                    {session.user.name && (
                       <Avatar.Image
                         alt={session.user.name}
-                        src={session.user.image}
+                        src={session.user.name}
                       />
                     )}
 
@@ -140,8 +157,9 @@ export default function AppNavbar() {
                   <Link href="/profile">My Profile</Link>
                 </DropdownItem>
 
-                <DropdownItem key="logout" color="danger">
-                  <Link href="/login"> Logout</Link>
+                <DropdownItem key="logout" color="danger" onPress={handleSignout}>
+               
+                    Logout
                  
                 </DropdownItem>
 
