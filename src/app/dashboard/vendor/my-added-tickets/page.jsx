@@ -24,7 +24,7 @@ const MyAddedTicketsPage = async () => {
   let errorMessage = "";
 
   try {
-    const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:5000";
+    const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL ;
     const res = await fetch(`${serverUrl}/vendor/my-added-tickets`, {
       method: "GET",
       headers: {
