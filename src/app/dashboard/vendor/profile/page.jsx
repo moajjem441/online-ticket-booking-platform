@@ -3,16 +3,17 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { Avatar, Chip } from "@heroui/react";
 import { Person, Envelope, ShieldCheck, Calendar } from "@gravity-ui/icons";
-// আপনার ডিজাইন টোকেনসমূহ ইমপোর্ট করুন
+
+
 import { card, title, text, muted } from "@/styles/ui";
 
-const UserProfilePage = async () => {
-  // সার্ভার সাইডে সেশন পাওয়া
+const VendorProfilePage = async () => {
+  
   const session = await auth.api.getSession({
-    headers: await headers(), // headers() একটি প্রমিজ রিটার্ন করে (Next.js 15+)
+    headers: await headers(), 
   });
 
-  // যদি সেশন না থাকে (লগইন করা নাই)
+
   if (!session) {
     return (
       <div className="flex items-center justify-center min-h-[60vh] px-4">
@@ -25,7 +26,6 @@ const UserProfilePage = async () => {
 
   const user = session.user;
 
-  // ইউজারের রোলের উপর ভিত্তি করে চিপ (Badge) এর কালার সেট করা
   const roleColor = 
     user.role === "admin" ? "danger" : 
     user.role === "vendor" ? "warning" : "primary";
@@ -41,7 +41,7 @@ const UserProfilePage = async () => {
         <Avatar
           src={user.image || "https://i.pravatar.cc/150?u=a042581f4e29026704d"}
           className="w-24 h-24 text-large border-2 border-blue-500/30 shadow-md"
-          isBordered
+          
           radius="xl"
           color={roleColor}
         />
@@ -116,4 +116,4 @@ const UserProfilePage = async () => {
   );
 };
 
-export default UserProfilePage;
+export default VendorProfilePage;

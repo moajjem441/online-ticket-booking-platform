@@ -22,7 +22,7 @@ export default function DashBoardLayout({ children }) {
         <main className="flex-1 p-6 overflow-auto">
           {children}
 
-          <UserPage></UserPage>
+          {/* <UserPage></UserPage> */}
         </main>
       </div>
     </div>

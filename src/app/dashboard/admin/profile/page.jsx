@@ -6,7 +6,7 @@ import { Person, Envelope, ShieldCheck, Calendar } from "@gravity-ui/icons";
 // আপনার ডিজাইন টোকেনসমূহ ইমপোর্ট করুন
 import { card, title, text, muted } from "@/styles/ui";
 
-const UserProfilePage = async () => {
+const AdminProfilePage = async () => {
   // সার্ভার সাইডে সেশন পাওয়া
   const session = await auth.api.getSession({
     headers: await headers(), // headers() একটি প্রমিজ রিটার্ন করে (Next.js 15+)
@@ -116,4 +116,4 @@ const UserProfilePage = async () => {
   );
 };
 
-export default UserProfilePage;
+export default AdminProfilePage;

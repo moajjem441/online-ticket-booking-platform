@@ -1,7 +1,18 @@
 "use client";
 
 import React, { useState } from "react";
-import { Bars, Bell, Envelope, Gear, House, Magnifier, Person, Ticket, Firewall, Archive, CirclePlusFill, PersonFill, Megaphone } from "@gravity-ui/icons";
+import Link from "next/link"; // 👈 ইমপোর্ট করুন
+import {
+  Bars,
+  Person,
+  Ticket,
+  Archive,
+  CirclePlusFill,
+  Envelope,
+  Firewall,
+  PersonFill,
+  Megaphone,
+} from "@gravity-ui/icons";
 import { Button, Drawer } from "@heroui/react";
 
 import { title, text, muted } from "@/styles/ui";
@@ -9,46 +20,39 @@ import { authClient } from "@/lib/auth-client";
 
 const SideBar = () => {
   const [isOpen, setIsOpen] = useState(false);
-
   const { data: session, isPending } = authClient.useSession();
   const user = session?.user;
 
+  // প্রতিটি আইটেমের সাথে href যোগ করা হলো
   const dashboardItems = {
     user: [
-      { icon: Person, label: " User Profile" },
-      { icon: Ticket, label: "My Booked Tickets" },
-      { icon: Archive, label: "Transactions History" },
+      { icon: Person, label: "User Profile", href: "/dashboard/user/profile" },
+      { icon: Ticket, label: "My Booked Tickets", href: "/dashboard/user/my-bookings" },
+      { icon: Archive, label: "Transactions History", href: "/dashboard/user/transactions" },
     ],
     vendor: [
-      { icon: Person, label: "Vendor Profile" },
-      { icon: CirclePlusFill, label: "Add Ticket" },
-      { icon: Ticket, label: "My Added Tickets" },
-      { icon: Envelope, label: "Requested Bookings" },
-      { icon: Firewall, label: "Revenue Overview" },
+      { icon: Person, label: "Vendor Profile", href: "/dashboard/vendor/profile" },
+      { icon: CirclePlusFill, label: "Add Ticket", href: "/dashboard/vendor/add-ticket" },
+      { icon: Ticket, label: "My Added Tickets", href: "/dashboard/vendor/my-added-tickets" },
+      { icon: Envelope, label: "Requested Bookings", href: "/dashboard/vendor/requested-bookings" },
+      { icon: Firewall, label: "Revenue Overview", href: "/dashboard/vendor/revenue" },
     ],
     admin: [
-      { icon: Person, label: "Admin Profile" },
-      { icon: Ticket, label: "Manage Tickets" },
-      { icon: PersonFill, label: "Manage Users" },
-      { icon: Megaphone, label: "Advertise Tickets" },
-    ]
+      { icon: Person, label: "Admin Profile", href: "/dashboard/admin/profile" },
+      { icon: Ticket, label: "Manage Tickets", href: "/dashboard/admin/manage-tickets" },
+      { icon: PersonFill, label: "Manage Users", href: "/dashboard/admin/manage-users" },
+      { icon: Megaphone, label: "Advertise Tickets", href: "/dashboard/admin/advertise-tickets" },
+    ],
   };
 
-  // ইউজারের রোল অনুযায়ী আইটেম সিলেক্ট করা হচ্ছে, যদি রোল না থাকে তবে ডিফল্ট 'user' আইটেম দেখাবে
   const currentNavItems = dashboardItems[user?.role] || dashboardItems["user"];
 
-  // =========================================================
-  // ⚠️ শুধুমাত্র এই লোডিং ব্লকটি (isPending) যুক্ত করা হয়েছে
-  // =========================================================
   if (isPending) {
     return (
       <>
-        {/* মোবাইলের জন্য লোডিং বাটন */}
         <div className="md:hidden flex top-4 z-40 p-4">
           <div className="h-10 w-24 bg-neutral-200 dark:bg-neutral-800 rounded-xl animate-pulse" />
         </div>
-        
-        {/* ডেস্কটপের জন্য লোডিং সাইডবার স্কেলিটন */}
         <aside className="hidden md:flex flex-col w-64 h-screen sticky top-0 bg-white dark:bg-neutral-950 border-r border-gray-200 dark:border-neutral-900 p-6">
           <div className="animate-pulse flex flex-col gap-4 w-full">
             <div className="h-8 bg-neutral-200 dark:bg-neutral-800 rounded-lg w-3/4 mb-6"></div>
@@ -63,12 +67,10 @@ const SideBar = () => {
 
   return (
     <>
-      {/* =========================================================
-          ১. মোবাইল ও ট্যাবলেট লেআউট (হ্যামবার্গার বাটন + ড্রয়ার)
-          ========================================================= */}
+      {/* মোবাইল হ্যামবার্গার */}
       <div className="md:hidden flex top-4 z-40 p-4">
-        <Button 
-          variant="flat" 
+        <Button
+          variant="flat"
           onClick={() => setIsOpen(true)}
           className={`gap-2 backdrop-blur-md bg-white/80 dark:bg-neutral-900/80 border border-gray-200 dark:border-neutral-800 ${title}`}
         >
@@ -77,7 +79,7 @@ const SideBar = () => {
         </Button>
       </div>
 
-      {/* HeroUI v3 কাস্টম ড্রয়ার */}
+      {/* মোবাইল ড্রয়ার */}
       <Drawer isOpen={isOpen} onOpenChange={setIsOpen}>
         <Drawer.Backdrop>
           <Drawer.Content placement="left" className="max-w-[280px]">
@@ -95,17 +97,16 @@ const SideBar = () => {
               </Drawer.Header>
               <Drawer.Body>
                 <nav className="flex flex-col gap-1.5">
-                  {/* মোবাইল ড্রয়ারের ডাইনামিক আইটেমসমূহ */}
                   {currentNavItems.map((item) => (
-                    <button
+                    <Link
                       key={item.label}
+                      href={item.href}
                       className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-left transition-colors hover:bg-gray-100 dark:hover:bg-neutral-900 w-full ${text}`}
-                      type="button"
-                      onClick={() => setIsOpen(false)}
+                      onClick={() => setIsOpen(false)} // ড্রয়ার বন্ধ
                     >
                       <item.icon className={`size-5 ${muted}`} />
                       {item.label}
-                    </button>
+                    </Link>
                   ))}
                 </nav>
               </Drawer.Body>
@@ -114,9 +115,7 @@ const SideBar = () => {
         </Drawer.Backdrop>
       </Drawer>
 
-      {/* =========================================================
-          ২. ডেস্কটপ লেআউট (ফিক্সড সাইডবার - স্ক্রিনের বাম পাশে থাকবে)
-          ========================================================= */}
+      {/* ডেস্কটপ সাইডবার */}
       <aside className="hidden md:flex flex-col w-64 h-screen sticky top-0 bg-white dark:bg-neutral-950 border-r border-gray-200 dark:border-neutral-900 p-6 transition-colors">
         <div className="mb-6">
           <h2 className={`text-2xl font-bold tracking-tight ${title}`}>
@@ -129,16 +128,15 @@ const SideBar = () => {
           </h2>
         </div>
         <nav className="flex flex-col gap-1.5">
-          {/* ডেস্কটপ সাইডবারের ডাইনামিক আইটেমসমূহ */}
           {currentNavItems.map((item) => (
-            <button
+            <Link
               key={item.label}
+              href={item.href}
               className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-left transition-colors hover:bg-gray-100 dark:hover:bg-neutral-900 w-full group ${text}`}
-              type="button"
             >
               <item.icon className={`size-5 transition-colors group-hover:text-blue-500 ${muted}`} />
               {item.label}
-            </button>
+            </Link>
           ))}
         </nav>
       </aside>
