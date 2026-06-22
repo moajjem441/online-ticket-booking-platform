@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Button, Card, Chip } from '@heroui/react';
 import { HiOutlineLocationMarker, HiOutlineCalendar, HiOutlineClock } from 'react-icons/hi';
 import { card, title, text, muted, buttonPrimary } from "@/styles/ui";
-import { TicketActions } from '@/components/dashboard/vendor/TicketsDelete';
+import { TicketActions } from '@/components/dashboard/vendor/TicketActions';
 
 
 
