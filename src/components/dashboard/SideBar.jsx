@@ -41,7 +41,7 @@ const SideBar = () => {
       { icon: Person, label: "Admin Profile", href: "/dashboard/admin/profile" },
       { icon: Ticket, label: "Manage Tickets", href: `/dashboard/admin/manage-ticket` },
       { icon: PersonFill, label: "Manage Users", href: "/dashboard/admin/manage-users" },
-      { icon: Megaphone, label: "Advertise Tickets", href: "/dashboard/admin/advertise-tickets" },
+      { icon: Megaphone, label: "Advertise Tickets", href: "/dashboard/admin/promote-tickets" },
     ],
   };
 
