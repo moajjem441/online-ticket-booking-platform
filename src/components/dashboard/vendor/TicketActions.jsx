@@ -22,6 +22,7 @@ export const TicketActions = ({ ticketId, isRejected }) => {
 
       if (res.ok) {
         // পেজটি রিফ্রেশ করে ইনস্ট্যান্ট ডেটা আপডেট করবে
+        alert("Ticket deleted successfully!");
         router.refresh();
       } else {
         alert("Failed to delete the ticket.");
