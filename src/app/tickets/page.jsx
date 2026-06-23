@@ -162,6 +162,7 @@ const AllTicketsPage = () => {
           ))}
         </div>
       )}
+      
     </div>
   );
 };
