@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { card, text, title, muted } from "@/styles/ui";
+import { authClient } from '@/lib/auth-client';
 
 const TicketDetailsPage = () => {
   const { id } = useParams();
@@ -19,7 +20,11 @@ const TicketDetailsPage = () => {
 
   const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
   // ডামি ইউজার ডেটা (রিয়েল অ্যাপে এটি আপনার Auth Context বা সেসশন থেকে আসবে)
-  const currentUser = { name: "Moajjem Hossain", email: "moajjem@example.com" }; 
+
+  const {data:cutrrentUser}=  authClient.useSession();
+  const user=cutrrentUser?.user;
+  const currentUser = { name: user?.name, email: user?.email };
+  // const currentUser = { name: "Moajjem Hossain", email: "moajjem@example.com" }; 
 
   // ১. টিকিটের ডিটেইলস ডেটা লোড করা
   useEffect(() => {
@@ -93,7 +98,15 @@ const TicketDetailsPage = () => {
       bookingQuantity: parseInt(bookingQty),
       unitPrice: ticket.price,
       totalPrice: ticket.price * parseInt(bookingQty),
-      status: "pending" // রিকোয়ারমেন্ট অনুযায়ী Pending স্ট্যাটাস
+    
+
+      fromLocation: ticket.fromLocation,
+  toLocation: ticket.toLocation,
+  departureDate: ticket.departureDate,
+  departureTime: ticket.departureTime || "00:00", // যদি নাল থাকে তবে ফ্যালব্যাক দিন
+  image: ticket.image || "", 
+
+    status: "pending" // রিকোয়ারমেন্ট অনুযায়ী Pending স্ট্যাটাস
     };
 
     try {
