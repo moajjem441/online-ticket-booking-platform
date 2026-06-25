@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { card, text, title, muted } from "@/styles/ui";
 import { authClient } from '@/lib/auth-client';
 import { loadStripe } from '@stripe/stripe-js';
+import { useSearchParams, useRouter } from 'next/navigation'; // 💡 ফিক্সের জন্য নতুন ইমপোর্ট
 
 // 💳 স্ট্রাইপ ইনিশিয়েলাইজেশন (আপনার .env.local ফাইলে NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY যুক্ত করুন)
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "pk_test_mock_key");
@@ -14,7 +15,7 @@ const BookingCountdown = ({ departureDate, departureTime, status, onExpire }) =>
   const [isExpired, setIsExpired] = useState(false);
 
   useEffect(() => {
-    if (status?.toLowerCase() === 'rejected') {
+    if (status?.toLowerCase() === 'rejected' || status?.toLowerCase() === 'paid') {
       setTimeLeft("");
       return;
     }
@@ -40,7 +41,7 @@ const BookingCountdown = ({ departureDate, departureTime, status, onExpire }) =>
     return () => clearInterval(interval);
   }, [departureDate, departureTime, status, onExpire]);
 
-  if (status?.toLowerCase() === 'rejected') return null;
+  if (status?.toLowerCase() === 'rejected' || status?.toLowerCase() === 'paid') return null;
 
   return (
     <p className={`text-xs font-bold m-0 mt-1 ${isExpired ? 'text-red-500' : 'text-orange-600 dark:text-orange-400'}`}>
@@ -58,32 +59,72 @@ const MyBookingsPage = () => {
   const { data: session } = authClient.useSession();
   const userEmail = session?.user?.email;
 
-  // ১. ইউজারের ইমেইল অনুযায়ী বুকিং ডেটা ফেচ করা
-  useEffect(() => {
-    if (!userEmail) return;
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  
+  // 💡 ইউআরএল কুয়েরি প্যারামিটার রিড করা হচ্ছে
+  const paymentSuccess = searchParams.get("payment_success");
+  const urlBookingId = searchParams.get("bookingId");
 
-    const fetchMyBookings = async () => {
-      try {
-        const res = await fetch(`${serverUrl}/bookings/${userEmail}`, { cache: 'no-store' });
-        if (res.ok) {
-          const data = await res.json();
-          setBookings(data);
+  // ১. ইউজারের ইমেইল অনুযায়ী বুকিং ডেটা ফেচ করার মূল ফাংশন
+  const fetchMyBookings = async () => {
+    if (!userEmail) return;
+    try {
+      const res = await fetch(`${serverUrl}/bookings/${userEmail}`, { cache: 'no-store' });
+      if (res.ok) {
+        const data = await res.json();
+        setBookings(data);
+      }
+    } catch (error) {
+      console.error("Error fetching user bookings:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 🔄 ৩. পেমেন্ট সাকসেস হ্যান্ডলিং (ইউআরএল-এ পেমেন্ট সাকসেস পেলে ব্যাকএন্ডে স্ট্যাটাস ও স্টক আপডেট করবে)
+  useEffect(() => {
+    const handleUrlPaymentSuccess = async () => {
+      if (paymentSuccess === "true" && urlBookingId) {
+        try {
+          setLoading(true); // ব্যাকগ্রাউন্ড প্রসেসিং এর জন্য লোডার ট্রিপল করা
+          
+          const res = await fetch(`${serverUrl}/bookings/update-status/${urlBookingId}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ status: "paid" }),
+          });
+
+          if (res.ok) {
+            console.log("🎯 Database payment status and ticket stock updated!");
+            
+            // ডেটা রি-ফেচ করে UI ইনস্ট্যান্ট আপডেট করা
+            await fetchMyBookings();
+            
+            // ইউআরএল থেকে লম্বা কুয়েরি প্যারামিটারগুলো ক্লিন করে ফ্রেশ পাথ রাখা
+            router.replace("/dashboard/user/my-bookings");
+          }
+        } catch (error) {
+          console.error("❌ Failed to auto-update payment status from URL:", error);
+        } finally {
+          setLoading(false);
         }
-      } catch (error) {
-        console.error("Error fetching user bookings:", error);
-      } finally {
-        setLoading(false);
       }
     };
 
-    fetchMyBookings();
-  }, [userEmail, serverUrl]);
+    if (userEmail) {
+      if (paymentSuccess === "true" && urlBookingId) {
+        handleUrlPaymentSuccess();
+      } else {
+        fetchMyBookings();
+      }
+    }
+  }, [userEmail, paymentSuccess, urlBookingId, serverUrl]);
 
   // ২. ফর্ম সাবমিট হ্যান্ডেলার (Stripe Checkout Integration)
   const handleFormPayment = async (e, booking) => {
-    e.preventDefault(); // ফর্মের ডিফল্ট সাবমিট পেজ লোড ব্লক করা
+    e.preventDefault(); 
 
-    // সেফটি চেক: ডিপার্চার টাইম পার হয়ে গেলে পেমেন্ট ব্লক করা হবে
     const departureDateTimeStr = `${booking.departureDate}T${booking.departureTime || "00:00"}`;
     if (new Date().getTime() > new Date(departureDateTimeStr).getTime()) {
       alert("You cannot make payment because the departure date and time have already passed!");
@@ -93,7 +134,6 @@ const MyBookingsPage = () => {
     setPaymentLoadingId(booking._id);
 
     try {
-      // 💡 সমাধান: রিলেটিভ পাথ ব্যবহার করে Next.js API রুটকে কল করা হয়েছে
       const res = await fetch("/api/checkout_sessions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -109,7 +149,6 @@ const MyBookingsPage = () => {
       if (res.ok) {
         const data = await res.json();
         
-        // ব্যাকএন্ড যদি সরাসরি রিডাইরেক্ট ইউআরএল পাঠায় তবে সেখানে পাঠানো হবে
         if (data.url) {
           window.location.href = data.url;
         } else if (data.sessionId) {
@@ -127,28 +166,21 @@ const MyBookingsPage = () => {
     }
   };
 
- // 🎨 সম্পূর্ণ হাই-কন্ট্রাস্ট কালার জেনারেটর ব্যাজ (সবগুলো স্ট্যাটাস একদম ক্লিয়ার বোঝার জন্য)
-const getStatusBadgeClass = (status) => {
-  switch (status?.toLowerCase()) {
-    case 'accepted': 
-      // 💜 কালার: গাঢ় পার্পল টেক্সট এবং স্ট্রং বর্ডার
-      return 'bg-purple-100 text-purple-950 border-purple-400 dark:bg-purple-950 dark:text-purple-200 dark:border-purple-700 font-extrabold';
-    
-    case 'paid': 
-      // 💚 কালার: গাঢ় গ্রিন টেক্সট এবং স্ট্রং বর্ডার
-      return 'bg-green-100 text-green-950 border-green-400 dark:bg-green-950 dark:text-green-200 dark:border-green-700 font-extrabold';
-    
-    case 'rejected': 
-      // ❤️ কালার: গাঢ় রেড টেক্সট এবং স্ট্রং বর্ডার
-      return 'bg-red-100 text-red-950 border-red-400 dark:bg-red-950 dark:text-red-200 dark:border-red-700 font-extrabold';
-    
-    default: 
-      // 💙 Pending এর জন্য: গাঢ় ব্লু টেক্সট এবং স্ট্রং বর্ডার
-      return 'bg-blue-100 text-blue-950 border-blue-400 dark:bg-blue-950 dark:text-blue-200 dark:border-blue-700 font-extrabold';
-  }
-};
+  // 🎨 সম্পূর্ণ হাই-কন্ট্রাস্ট কালার জেনারেটর ব্যাজ
+  const getStatusBadgeClass = (status) => {
+    switch (status?.toLowerCase()) {
+      case 'accepted': 
+        return 'bg-purple-100 text-purple-950 border-purple-400 dark:bg-purple-950 dark:text-purple-200 dark:border-purple-700 font-extrabold';
+      case 'paid': 
+        return 'bg-green-100 text-green-950 border-green-400 dark:bg-green-950 dark:text-green-200 dark:border-green-700 font-extrabold';
+      case 'rejected': 
+        return 'bg-red-100 text-red-950 border-red-400 dark:bg-red-950 dark:text-red-200 dark:border-red-700 font-extrabold';
+      default: 
+        return 'bg-blue-100 text-blue-950 border-blue-400 dark:bg-blue-950 dark:text-blue-200 dark:border-blue-700 font-extrabold';
+    }
+  };
 
-  if (loading) return <div className="text-center py-12 text-sm text-gray-500">Loading your bookings...</div>;
+  if (loading) return <div className="text-center py-12 text-sm text-gray-500">Processing and loading your bookings...</div>;
 
   return (
     <div className="w-full max-w-7xl mx-auto p-4 md:p-6 space-y-6" style={{ fontFamily: 'sans-serif' }}>
@@ -206,7 +238,7 @@ const getStatusBadgeClass = (status) => {
                       📅 Departure: <b>{booking.departureDate || 'N/A'}</b> at {booking.departureTime || 'Not Specified'}
                     </p>
 
-                    {/* টাইমার সেকশন (রিজেক্টেড না হলে কাউন্টডাউন দেখাবে) */}
+                    {/* টাইমার সেকশন */}
                     <div className="pt-1 border-t border-gray-50 dark:border-neutral-800/20">
                       <BookingCountdown 
                         departureDate={booking.departureDate} 
@@ -228,10 +260,9 @@ const getStatusBadgeClass = (status) => {
                     </div>
                   </div>
 
-                  {/* 📝 এখানে শর্তসাপেক্ষে HTML ফর্ম অ্যাকশন সেটআপ করা হয়েছে */}
+                  {/* 📝 ফর্ম অ্যাকশন */}
                   {showPayButton && (
                     <form onSubmit={(e) => handleFormPayment(e, booking)} method="POST">
-                      {/* ডেটা ট্র্যাকিং এর জন্য হিডেন ইনপুট */}
                       <input type="hidden" name="bookingId" value={booking._id} />
                       
                       <button
@@ -246,7 +277,7 @@ const getStatusBadgeClass = (status) => {
                     </form>
                   )}
 
-                  {/* টাইম পার হয়ে গেলে ওয়ার্নিং টেক্সট */}
+                  {/* টাইম পার হয়ে গেলে ওয়ার্নিং টেক্সট */}
                   {booking.status?.toLowerCase() === 'accepted' && isExpired && (
                     <p className="text-center text-[11px] text-red-500 font-semibold m-0 bg-red-50 dark:bg-red-950/20 py-1.5 rounded">
                       ❌ Payment locked: Departure time has passed.
