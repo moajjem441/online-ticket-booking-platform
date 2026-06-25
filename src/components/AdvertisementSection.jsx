@@ -29,80 +29,111 @@ const AdvertisementSection = () => {
     fetchAdvertisedTickets();
   }, [serverUrl]);
 
-  if (loading) return <div className="text-center py-10 text-sm text-gray-500">Loading Featured Offers...</div>;
+  if (loading) return <div className="text-center py-10 text-sm text-gray-500 bg-white dark:bg-[#0d0811]">Loading Featured Offers...</div>;
   if (adTickets.length === 0) return null; // কোনো বিজ্ঞাপন না থাকলে সেকশনটি হাইড থাকবে
 
   return (
-    <div className="w-full max-w-7xl mx-auto p-4 md:p-6 space-y-6" style={{ fontFamily: 'sans-serif' }}>
-      <div className="border-b border-gray-100 dark:border-neutral-800 pb-4">
-        <h2 className={`${title} text-2xl font-bold m-0`}>🎉 Featured Advertisements</h2>
-        <p className={`${muted} text-sm m-0 mt-1`}>Top picks verified by Admin</p>
-      </div>
+    <section className="relative w-full bg-white dark:bg-[#0d0811] py-12 overflow-hidden border-b border-gray-100 dark:border-neutral-900/40 transition-colors duration-300">
 
-      {/* রেসপন্সিভ ৩-কলাম কার্ড লেআউট */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {adTickets.map((ticket) => (
-          <div key={ticket._id} className={`${card} flex flex-col justify-between overflow-hidden shadow-md hover:shadow-lg transition-all rounded-xl border border-gray-100 dark:border-neutral-800 bg-white dark:bg-neutral-900`}>
-            
-            {/* ১. ইমেজ ও ট্রান্সপোর্ট টাইপ */}
-            <div className="relative h-48 w-full bg-gray-100 dark:bg-neutral-800">
-              {ticket.image ? (
-                <img src={ticket.image} alt={ticket.title} className="w-full h-full object-cover" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">No Image</div>
-              )}
-              {ticket.transportType && (
-                <span className="absolute top-3 right-3 bg-black/70 backdrop-blur-sm text-white px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">
-                  🚌 {ticket.transportType}
-                </span>
-              )}
-            </div>
+      {/* 🔮 ব্যানার স্টাইল ব্যাকগ্রাউন্ড গ্লো (Background Glows) */}
+      <div className="absolute top-[20%] right-[-10%] w-[40vw] h-[40vw] bg-blue-500/10 dark:bg-blue-600/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] left-[-10%] w-[35vw] h-[35vw] bg-purple-500/10 dark:bg-purple-600/5 rounded-full blur-[120px] pointer-events-none" />
 
-            {/* কার্ড বডি কন্টেন্ট */}
-            <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
-              <div className="space-y-2">
-                {/* ২. টিকিট টাইটেল */}
-                <h3 className={`${title} text-lg font-bold line-clamp-1 m-0`}>{ticket.title}</h3>
-                <p className="text-xs text-gray-500 dark:text-neutral-400 m-0">{ticket.fromLocation} ➔ {ticket.toLocation}</p>
+      <div className="w-full max-w-7xl mx-auto p-4 md:p-6 space-y-6 z-10 relative" style={{ fontFamily: 'sans-serif' }}>
 
-                {/* ৫. পার্কস (Perks) */}
-                {ticket.perks && (
-                  <div className="flex flex-wrap gap-1 pt-1">
-                    {(Array.isArray(ticket.perks) ? ticket.perks : ticket.perks.split(',')).map((perk, index) => (
-                      <span key={index} className="bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400 px-2 py-0.5 rounded text-[10px] font-medium">
-                        ✓ {perk.trim()}
-                      </span>
-                    ))}
-                  </div>
+        {/* সেকশন হেডার - ব্যানার স্টাইল গ্রাডিয়েন্ট এবং সাব-ব্যাজ */}
+        <div className="border-b border-gray-100 dark:border-neutral-800 pb-4">
+
+          {/* ব্যানার স্টাইল ছোট ব্যাজ */}
+          <div className="inline-flex items-center gap-2 border border-purple-300 dark:border-purple-500/30 bg-purple-100 dark:bg-purple-950/20 text-purple-700 dark:text-purple-300 text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full backdrop-blur-md mb-3">
+            <span className="flex h-1.5 w-1.5 rounded-full bg-rose-500 animate-pulse" />
+            Sponsored Offers
+          </div>
+
+          <h2 className="text-3xl md:text-5xl font-black tracking-tight text-gray-900 dark:text-white m-0">
+            🎉 Featured{" "}
+            <span className="bg-gradient-to-r from-pink-500 via-rose-400 to-orange-400 bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(244,63,94,0.15)]">
+              Advertisements
+            </span>
+          </h2>
+          <p className={`${muted} text-sm m-0 mt-1 font-light`}>Top picks verified by Admin</p>
+        </div>
+
+        {/* রেসপন্সিভ ৩-কলাম কার্ড লেআউট */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {adTickets.map((ticket) => (
+            <div
+              key={ticket._id}
+              className={`${card} flex flex-col justify-between overflow-hidden shadow-md hover:shadow-lg transition-all rounded-xl border border-gray-100 dark:border-neutral-800 bg-white dark:bg-neutral-900`}
+            >
+
+              {/* ১. ইমেজ ও ট্রান্সপোর্ট টাইপ */}
+              <div className="relative h-48 w-full bg-gray-100 dark:bg-neutral-800">
+                {ticket.image ? (
+                  <img src={ticket.image} alt={ticket.title} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">No Image</div>
+                )}
+                {ticket.transportType && (
+                  <span className="absolute top-3 right-3 bg-black/70 backdrop-blur-sm text-white px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">
+                    🚌 {ticket.transportType}
+                  </span>
                 )}
               </div>
 
-              {/* ৩. প্রাইস এবং ৪. কোয়ান্টিটি */}
-              <div className="flex items-center justify-between border-t border-gray-50 dark:border-neutral-800/40 pt-3">
-                <div>
-                  <p className="text-[10px] text-gray-400 uppercase m-0">Price per unit</p>
-                  <p className={`${title} text-xl font-extrabold text-blue-600 dark:text-blue-400 m-0`}>৳{ticket.price}</p>
+              {/* কার্ড বডি কন্টেন্ট */}
+              <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+                <div className="space-y-2">
+                  {/* ২. টিকিট টাইটেল */}
+                  <h3 className={`${title} text-lg font-bold line-clamp-1 m-0 text-gray-900 dark:text-white`}>
+                    {ticket.title}
+                  </h3>
+                  <p className="text-xs text-gray-500 dark:text-neutral-400 m-0">
+                    {ticket.fromLocation} ➔ {ticket.toLocation}
+                  </p>
+
+                  {/* ৫. পার্কস (Perks) */}
+                  {ticket.perks && (
+                    <div className="flex flex-wrap gap-1 pt-1">
+                      {(Array.isArray(ticket.perks) ? ticket.perks : ticket.perks.split(',')).map((perk, index) => (
+                        <span key={index} className="bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400 px-2 py-0.5 rounded text-[10px] font-medium">
+                          ✓ {perk.trim()}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
-                <div className="text-right">
-                  <p className="text-[10px] text-gray-400 uppercase m-0">Quantity</p>
-                  <p className={`${text} text-sm font-semibold m-0`}>{ticket.quantity || ticket.ticketQuantity || 0} Pcs</p>
+
+                {/* ৩. প্রাইস এবং ৪. কোয়ান্টিটি */}
+                <div className="flex items-center justify-between border-t border-gray-50 dark:border-neutral-800/40 pt-3">
+                  <div>
+                    <p className="text-[10px] text-gray-400 uppercase m-0">Price per unit</p>
+                    <p className={`${title} text-xl font-extrabold text-blue-600 dark:text-blue-400 m-0`}>৳{ticket.price}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[10px] text-gray-400 uppercase m-0">Quantity</p>
+                    <p className={`${text} text-sm font-semibold m-0 text-gray-800 dark:text-neutral-200`}>
+                      {ticket.quantity || ticket.ticketQuantity || 0} Pcs
+                    </p>
+                  </div>
                 </div>
+
+                {/* 🔍 See Details বাটন */}
+                <button
+                  onClick={() => router.push(`/tickets/${ticket._id}`)}
+                  className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg text-sm transition-all shadow-sm shadow-blue-600/10"
+                  style={{ border: 'none', cursor: 'pointer' }}
+                >
+                  See Details
+                </button>
               </div>
 
-              {/* 🔍 See Details বাটন */}
-              <button
-                onClick={() => router.push(`/tickets/${ticket._id}`)} // রিকোয়ারমেন্ট ৫ রাউট
-                className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg text-sm transition-all"
-                style={{ border: 'none', cursor: 'pointer' }}
-              >
-                See Details
-              </button>
             </div>
+          ))}
+        </div>
 
-          </div>
-        ))}
       </div>
-    </div>
+    </section>
   );
 };
 

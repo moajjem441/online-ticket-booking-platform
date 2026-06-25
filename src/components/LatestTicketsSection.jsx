@@ -36,10 +36,16 @@ const LatestTicketsSection = () => {
       <div className="w-full max-w-7xl mx-auto p-4 md:p-6 space-y-6" style={{ fontFamily: 'sans-serif' }}>
         
         {/* সেকশন হেডার */}
-        <div className="border-b border-gray-100 dark:border-neutral-800 pb-4">
-          <h2 className={`${title} text-2xl font-bold m-0 text-gray-900 dark:text-white`}>🆕 Recently Added Tickets</h2>
-          <p className={`${muted} text-sm m-0 mt-1`}>Explore the latest available travel tickets listed just now</p>
-        </div>
+        {/* সেকশন হেডার */}
+<div className="border-b border-gray-100 dark:border-neutral-800 pb-4">
+  <h2 className="text-3xl md:text-5xl font-black tracking-tight text-gray-900 dark:text-white m-0">
+    🆕 Recently Added{" "}
+    <span className="bg-gradient-to-r from-violet-600 via-indigo-500 to-cyan-500 bg-clip-text text-transparent">
+      Tickets
+    </span>
+  </h2>
+  <p className={`${muted} text-sm md:text-base m-0 mt-1 font-light`}>Explore the latest available travel tickets listed just now</p>
+</div>
 
         {/* রেসপন্সিভ কার্ড গ্রিড লেআউট */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">

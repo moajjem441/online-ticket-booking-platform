@@ -21,6 +21,11 @@ import { FaMoneyBillWave, FaHashtag } from "react-icons/fa";
 import { card, title, text, muted, buttonPrimary } from "@/styles/ui";
 import { authClient } from "@/lib/auth-client";
 
+
+import toast from 'react-hot-toast';
+
+
+
 const AddTicketPage = () => {
   const router = useRouter();
   const { data: session, isPending } = authClient.useSession();
@@ -103,11 +108,11 @@ const AddTicketPage = () => {
 
       if (!res.ok) throw new Error("Failed to save ticket");
 
-      alert("Ticket added successfully! 🎫");
+      toast.success("Ticket added successfully! 🎫");
       router.push("/dashboard/vendor/my-added-tickets");
     } catch (error) {
       console.error(error);
-      alert("Something went wrong. Please try again.");
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -288,11 +293,11 @@ const AddTicketPage = () => {
             </div>
           </div>
 
-          {/* Perks – Basic Checkbox Format */}
+          
           {/* Perks – Basic Checkbox Format */}
           <div className="space-y-2">
             <span className={`text-sm font-medium ${text}`}>
-              Perks / Amenities
+              Perks / Amenities (Must have to click on Text)
             </span>
 
             <div className="flex flex-wrap gap-3">

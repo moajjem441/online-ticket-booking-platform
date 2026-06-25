@@ -4,7 +4,7 @@ import AppNavbar from "@/components/Navbar";
 import NextThemeProviders from "@/providers/NextThemeProviders";
 import Footer from "@/components/Footer";
 
-
+import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,6 +39,26 @@ export default function RootLayout({ children }) {
           <Footer></Footer>
     </NextThemeProviders>
           
+
+          <Toaster 
+          position="top-right"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: '#363636',
+              color: '#fff',
+            },
+            success: {
+              duration: 3000,
+              icon: '✅',
+            },
+            error: {
+              duration: 4000,
+              icon: '❌',
+            },
+          }}
+        />
+
        
       </body>
     </html>
