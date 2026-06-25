@@ -5,6 +5,8 @@ import { useParams, useRouter } from 'next/navigation';
 import { card, text, title, muted } from "@/styles/ui";
 import { authClient } from '@/lib/auth-client';
 
+import toast from 'react-hot-toast';
+
 const TicketDetailsPage = () => {
   const { id } = useParams();
   const router = useRouter();
@@ -79,12 +81,12 @@ const TicketDetailsPage = () => {
 
     // ভ্যালিডেশন: বুকিং কোয়ান্টিটি যেন এভেইলেবল কোয়ান্টিটির চেয়ে বড় না হয়
     if (parseInt(bookingQty) > availableQty) {
-      alert(`Booking quantity cannot be greater than available Ticket Quantity (${availableQty} Pcs)!`);
+      toast.error(`Booking quantity cannot be greater than available Ticket Quantity (${availableQty} Pcs)!`);
       return;
     }
 
     if (parseInt(bookingQty) <= 0) {
-      alert("Please enter a valid booking quantity.");
+      toast.error("Please enter a valid booking quantity.");
       return;
     }
 
@@ -117,11 +119,11 @@ const TicketDetailsPage = () => {
       });
 
       if (res.ok) {
-        alert("Booking request submitted successfully!");
+        toast.success("Booking request submitted successfully!");
         setIsModalOpen(false);
         router.push('/dashboard/user/my-bookings'); // সরাসরি My Booked Tickets পেজে নিয়ে যাবে
       } else {
-        alert("Failed to confirm booking.");
+        toast.error("Failed to confirm booking.");
       }
     } catch (error) {
       console.error("Booking submission error:", error);

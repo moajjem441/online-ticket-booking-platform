@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { card, text, title, muted } from "@/styles/ui";
 
+import toast from 'react-hot-toast';
+
 const ManageUsersPage = () => {
   const [users, setUsers] = useState([]);
   const [loadingId, setLoadingId] = useState(null);
@@ -39,14 +41,14 @@ const ManageUsersPage = () => {
 
       const data = await res.json();
       if (res.ok) {
-        alert(data.message);
+        toast.success(data.message);
         fetchUsers(); // টেবিল রিফ্রেশ
       } else {
-        alert(data.message || "Failed to update user.");
+        toast.error(data.message || "Failed to update user.");
       }
     } catch (error) {
       console.error("Update error:", error);
-      alert("Something went wrong!");
+      toast.error("Something went wrong!");
     } finally {
       setLoadingId(null);
     }
