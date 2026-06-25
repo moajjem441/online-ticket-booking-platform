@@ -5,6 +5,10 @@ import { useRouter } from 'next/navigation';
 // আপনার ডিফাইন করা স্টাইল ইম্পোর্ট করা হলো
 import { card, text, title, muted } from "@/styles/ui";
 
+import toast from 'react-hot-toast';
+
+
+
 const AdminTicketManagePage = () => {
   const router = useRouter();
   const [tickets, setTickets] = useState([]);
@@ -42,14 +46,14 @@ const AdminTicketManagePage = () => {
       });
 
       if (res.ok) {
-        alert(`Ticket successfully ${newStatus}!`);
+        toast.success(`Ticket successfully ${newStatus}!`);
         fetchTickets(); 
       } else {
-        alert("Failed to update status.");
+        toast.error("Failed to update status.");
       }
     } catch (error) {
       console.error("Status update error:", error);
-      alert("Something went wrong!");
+      toast.error("Something went wrong!");
     } finally {
       setLoadingId(null); 
     }

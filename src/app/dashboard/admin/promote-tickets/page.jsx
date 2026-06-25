@@ -4,6 +4,11 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { card, text, title, muted } from "@/styles/ui";
 
+
+import toast from 'react-hot-toast';
+
+
+
 const AdminAdvertiseTicketsPage = () => {
   const router = useRouter();
   const [tickets, setTickets] = useState([]);
@@ -46,14 +51,14 @@ const AdminAdvertiseTicketsPage = () => {
       const responseData = await res.json();
 
       if (res.ok) {
-        alert(responseData.message);
+        toast.success(responseData.message);
         fetchApprovedTickets(); // রিয়েল-টাইম স্টেট আপডেট
       } else {
-        alert(responseData.message || "Failed to update advertisement status.");
+        toast.error(responseData.message || "Failed to update advertisement status.");
       }
     } catch (error) {
       console.error("Advertise toggle error:", error);
-      alert("Something went wrong!");
+      toast.error("Something went wrong!");
     } finally {
       setLoadingId(null);
     }
