@@ -68,16 +68,16 @@ const UpdateTicket = ({ ticketData }) => {
       );
 
       if (res.ok) {
-        alert("Ticket updated successfully!");
+        toast.success("Ticket updated successfully!");
         router.push("/dashboard/vendor/my-added-tickets");
         router.refresh();
       } else {
         const errData = await res.json();
-        alert(errData.message || "Failed to update ticket.");
+        toast.error(errData.message || "Failed to update ticket.");
       }
     } catch (error) {
       console.error(error);
-      alert("Something went wrong!");
+      toast.error("Something went wrong!");
     } finally {
       setIsSubmitting(false);
     }
