@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { Button } from '@heroui/react';
 import { useRouter } from 'next/navigation';
 
+import toast from 'react-hot-toast';
+
 export const TicketActions = ({ ticketId, isRejected }) => {
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
@@ -22,14 +24,14 @@ export const TicketActions = ({ ticketId, isRejected }) => {
 
       if (res.ok) {
         // পেজটি রিফ্রেশ করে ইনস্ট্যান্ট ডেটা আপডেট করবে
-        alert("Ticket deleted successfully!");
+        toast.success("Ticket deleted successfully!");
         router.refresh();
       } else {
-        alert("Failed to delete the ticket.");
+        toast.error("Failed to delete the ticket.");
       }
     } catch (error) {
       console.error("Delete error:", error);
-      alert("Something went wrong!");
+      toast.error("Something went wrong!");
     } finally {
       setIsDeleting(false);
     }

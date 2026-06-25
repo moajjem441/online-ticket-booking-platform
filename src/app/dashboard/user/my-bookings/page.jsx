@@ -6,6 +6,10 @@ import { authClient } from '@/lib/auth-client';
 import { loadStripe } from '@stripe/stripe-js';
 import { useSearchParams, useRouter } from 'next/navigation'; // 💡 ফিক্সের জন্য নতুন ইমপোর্ট
 
+
+import toast from 'react-hot-toast';
+
+
 // 💳 স্ট্রাইপ ইনিশিয়েলাইজেশন (আপনার .env.local ফাইলে NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY যুক্ত করুন)
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "pk_test_mock_key");
 
@@ -127,7 +131,7 @@ const MyBookingsPage = () => {
 
     const departureDateTimeStr = `${booking.departureDate}T${booking.departureTime || "00:00"}`;
     if (new Date().getTime() > new Date(departureDateTimeStr).getTime()) {
-      alert("You cannot make payment because the departure date and time have already passed!");
+      toast.error("You cannot make payment because the departure date and time have already passed!");
       return;
     }
 
@@ -157,7 +161,7 @@ const MyBookingsPage = () => {
           if (error) console.error("Stripe redirect error:", error);
         }
       } else {
-        alert("Failed to initiate Stripe payment session.");
+        toast.error("Failed to initiate Stripe payment session.");
       }
     } catch (error) {
       console.error("Payment error:", error);
