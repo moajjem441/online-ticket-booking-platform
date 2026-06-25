@@ -8,7 +8,7 @@ import { loadStripe } from '@stripe/stripe-js';
 // 💳 স্ট্রাইপ ইনিশিয়েলাইজেশন (আপনার .env.local ফাইলে NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY যুক্ত করুন)
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "pk_test_mock_key");
 
-// 🕒 প্রতিটা কার্ডের জন্য আলাদা লাইভ কাউন্টডাউন কম্পোনেন্ট
+// 🕒 লাইভ কাউন্টডাউন কম্পোনেন্ট
 const BookingCountdown = ({ departureDate, departureTime, status, onExpire }) => {
   const [timeLeft, setTimeLeft] = useState("");
   const [isExpired, setIsExpired] = useState(false);
@@ -38,7 +38,7 @@ const BookingCountdown = ({ departureDate, departureTime, status, onExpire }) =>
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [departureDate, departureTime, status]);
+  }, [departureDate, departureTime, status, onExpire]);
 
   if (status?.toLowerCase() === 'rejected') return null;
 
@@ -58,13 +58,12 @@ const MyBookingsPage = () => {
   const { data: session } = authClient.useSession();
   const userEmail = session?.user?.email;
 
-  // ১. ইউজারের ইমেইল অনুযায়ী বুকিং ডেটা ফেচ করা
+  // ১. ইউজারের ইমেইল অনুযায়ী বুকিং ডেটা ফেচ করা
   useEffect(() => {
     if (!userEmail) return;
 
     const fetchMyBookings = async () => {
       try {
-        // নোট: ব্যাকএন্ড এপিআই স্ট্রাকচার অনুযায়ী ইউজার স্পেসিফিক রুট বা ফিল্টারিং অ্যাডজাস্ট করতে পারেন
         const res = await fetch(`${serverUrl}/bookings/${userEmail}`, { cache: 'no-store' });
         if (res.ok) {
           const data = await res.json();
@@ -80,9 +79,11 @@ const MyBookingsPage = () => {
     fetchMyBookings();
   }, [userEmail, serverUrl]);
 
-  // ২. পেমেন্ট হ্যান্ডেলার (Stripe Checkout Integration)
-  const handlePayment = async (booking) => {
-    // সেফটি চেক: ডিপার্চার টাইম পার হয়ে গেলে পেমেন্ট ব্লক করা হবে
+  // ২. ফর্ম সাবমিট হ্যান্ডেলার (Stripe Checkout Integration)
+  const handleFormPayment = async (e, booking) => {
+    e.preventDefault(); // ফর্মের ডিফল্ট সাবমিট পেজ লোড ব্লক করা
+
+    // সেফটি চেক: ডিপার্চার টাইম পার হয়ে গেলে পেমেন্ট ব্লক করা হবে
     const departureDateTimeStr = `${booking.departureDate}T${booking.departureTime || "00:00"}`;
     if (new Date().getTime() > new Date(departureDateTimeStr).getTime()) {
       alert("You cannot make payment because the departure date and time have already passed!");
@@ -92,8 +93,8 @@ const MyBookingsPage = () => {
     setPaymentLoadingId(booking._id);
 
     try {
-      // ব্যাকএন্ডে স্ট্রাইপ পেমেন্ট সেশন তৈরির রিকোয়েস্ট
-      const res = await fetch(`${serverUrl}/payments/create-checkout-session`, {
+      // 💡 সমাধান: রিলেটিভ পাথ ব্যবহার করে Next.js API রুটকে কল করা হয়েছে
+      const res = await fetch("/api/checkout_sessions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -106,12 +107,16 @@ const MyBookingsPage = () => {
       });
 
       if (res.ok) {
-        const { sessionId } = await res.json();
-        const stripe = await stripePromise;
+        const data = await res.json();
         
-        // স্ট্রাইপ পেমেন্ট ইন্টারফেসে রিডাইরেক্ট
-        const { error } = await stripe.redirectToCheckout({ sessionId });
-        if (error) console.error("Stripe redirect error:", error);
+        // ব্যাকএন্ড যদি সরাসরি রিডাইরেক্ট ইউআরএল পাঠায় তবে সেখানে পাঠানো হবে
+        if (data.url) {
+          window.location.href = data.url;
+        } else if (data.sessionId) {
+          const stripe = await stripePromise;
+          const { error } = await stripe.redirectToCheckout({ sessionId: data.sessionId });
+          if (error) console.error("Stripe redirect error:", error);
+        }
       } else {
         alert("Failed to initiate Stripe payment session.");
       }
@@ -122,15 +127,26 @@ const MyBookingsPage = () => {
     }
   };
 
-  // স্ট্যাটাস কালার জেনারেটর ব্যাজ
-  const getStatusBadgeClass = (status) => {
-    switch (status?.toLowerCase()) {
-      case 'accepted': return 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-400';
-      case 'paid': return 'bg-green-50 text-green-700 border-green-200 dark:bg-green-950/30 dark:text-green-400';
-      case 'rejected': return 'bg-red-50 text-red-700 border-red-200 dark:bg-red-950/30 dark:text-red-400';
-      default: return 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-400'; // pending
-    }
-  };
+ // 🎨 সম্পূর্ণ হাই-কন্ট্রাস্ট কালার জেনারেটর ব্যাজ (সবগুলো স্ট্যাটাস একদম ক্লিয়ার বোঝার জন্য)
+const getStatusBadgeClass = (status) => {
+  switch (status?.toLowerCase()) {
+    case 'accepted': 
+      // 💜 কালার: গাঢ় পার্পল টেক্সট এবং স্ট্রং বর্ডার
+      return 'bg-purple-100 text-purple-950 border-purple-400 dark:bg-purple-950 dark:text-purple-200 dark:border-purple-700 font-extrabold';
+    
+    case 'paid': 
+      // 💚 কালার: গাঢ় গ্রিন টেক্সট এবং স্ট্রং বর্ডার
+      return 'bg-green-100 text-green-950 border-green-400 dark:bg-green-950 dark:text-green-200 dark:border-green-700 font-extrabold';
+    
+    case 'rejected': 
+      // ❤️ কালার: গাঢ় রেড টেক্সট এবং স্ট্রং বর্ডার
+      return 'bg-red-100 text-red-950 border-red-400 dark:bg-red-950 dark:text-red-200 dark:border-red-700 font-extrabold';
+    
+    default: 
+      // 💙 Pending এর জন্য: গাঢ় ব্লু টেক্সট এবং স্ট্রং বর্ডার
+      return 'bg-blue-100 text-blue-950 border-blue-400 dark:bg-blue-950 dark:text-blue-200 dark:border-blue-700 font-extrabold';
+  }
+};
 
   if (loading) return <div className="text-center py-12 text-sm text-gray-500">Loading your bookings...</div>;
 
@@ -200,7 +216,7 @@ const MyBookingsPage = () => {
                     </div>
                   </div>
 
-                  {/* কোয়ান্টিটি ও টোটাল প্রাইস সেকশন */}
+                  {/* কোয়ান্টিটি ও টোটাল প্রাইস সেকশন */}
                   <div className="flex items-center justify-between bg-gray-50 dark:bg-neutral-950 p-3 rounded-lg text-xs">
                     <div>
                       <p className="text-gray-400 text-[10px] uppercase m-0">Qty Booked</p>
@@ -212,16 +228,22 @@ const MyBookingsPage = () => {
                     </div>
                   </div>
 
-                  {/* শর্তসাপেক্ষে "Pay Now" বাটন প্রদর্শন */}
+                  {/* 📝 এখানে শর্তসাপেক্ষে HTML ফর্ম অ্যাকশন সেটআপ করা হয়েছে */}
                   {showPayButton && (
-                    <button
-                      onClick={() => handlePayment(booking)}
-                      disabled={paymentLoadingId === booking._id}
-                      className="w-full py-2.5 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg text-xs transition-all shadow-sm active:scale-[0.99] disabled:opacity-50"
-                      style={{ border: 'none', cursor: 'pointer' }}
-                    >
-                      {paymentLoadingId === booking._id ? "Processing..." : "💳 Pay Now"}
-                    </button>
+                    <form onSubmit={(e) => handleFormPayment(e, booking)} method="POST">
+                      {/* ডেটা ট্র্যাকিং এর জন্য হিডেন ইনপুট */}
+                      <input type="hidden" name="bookingId" value={booking._id} />
+                      
+                      <button
+                        type="submit"
+                        role="link"
+                        disabled={paymentLoadingId === booking._id}
+                        className="w-full py-2.5 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg text-xs transition-all shadow-sm active:scale-[0.99] disabled:opacity-50"
+                        style={{ border: 'none', cursor: 'pointer' }}
+                      >
+                        {paymentLoadingId === booking._id ? "Processing..." : "💳 Pay Now"}
+                      </button>
+                    </form>
                   )}
 
                   {/* টাইম পার হয়ে গেলে ওয়ার্নিং টেক্সট */}
