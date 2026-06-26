@@ -47,13 +47,13 @@ export default function RegisterPage() {
     }
   };
 
-//   const handleGoogleLogin = async () => {
-//     await authClient.signIn.social({
-//       provider: "google",
-//       callbackURL: "/",
-//     });
+  const handleGoogleLogin = async () => {
+    await authClient.signIn.social({
+      provider: "google",
+      callbackURL: "/",
+    });
   
-// };
+};
 
   return (
     <div className="w-full min-h-[85vh] flex items-center justify-center px-4 relative transition-colors pt-20">
@@ -173,7 +173,7 @@ export default function RegisterPage() {
 
         {/* Google Social Button */}
         <Button 
-        //   onClick={handleGoogleLogin} 
+          onClick={handleGoogleLogin} 
           variant="bordered" 
           className={`w-full border-gray-200 dark:border-neutral-800 hover:bg-gray-50 dark:hover:bg-neutral-800 font-medium h-12 rounded-xl gap-2 ${title}`}
         >
