@@ -14,15 +14,15 @@ export const auth = betterAuth({
     enabled: true, 
   },
 
-  // 🔗 অ্যাকাউন্ট লিঙ্কিং সেটিংস (ইমেইল এবং গুগল অ্যাকাউন্ট মার্জ করার জন্য)
+
   account: {
     accountLinking: {
       enabled: true,
-      trustedProviders: ["google"], // আপনি যেহেতু গুগল ব্যবহার করছেন
+      trustedProviders: ["google"], 
     },
   },
 
-  // 🌐 সোশ্যাল প্রোভাইডার সেটিংস
+  
   socialProviders: {
     google: { 
       clientId: process.env.GOOGLE_CLIENT_ID , 
@@ -30,12 +30,12 @@ export const auth = betterAuth({
     }, 
   },
 
-  // 👤 ইউজার স্কিমা ও ডিফল্ট রোল 'user' সেট করা
+  
   user: {
     additionalFields: {
       role: {
         type: "string",
-        defaultValue: "user", // নতুন সাইন-আপ করলেই অটোমেটিক 'user' রোল পাবে
+        defaultValue: "user", 
       },
     },
   },

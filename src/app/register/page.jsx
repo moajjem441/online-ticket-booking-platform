@@ -52,6 +52,7 @@ export default function RegisterPage() {
       provider: "google",
       callbackURL: "/",
     });
+    
   
 };
 
