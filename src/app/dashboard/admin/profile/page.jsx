@@ -40,7 +40,7 @@ const AdminProfilePage = async () => {
       <div className={`p-6 md:p-8 flex flex-col sm:flex-row items-center gap-6 shadow-xl relative z-10 ${card}`}>
         <Avatar
           src={user.image || "https://i.pravatar.cc/150?u=a042581f4e29026704d"}
-          className="w-24 h-24 text-large border-10 border-blue-500/30 shadow-md"
+          className="w-24 h-24 text-large border-8 border-blue-500/30 shadow-md"
           
           radius="xl"
           color={roleColor}

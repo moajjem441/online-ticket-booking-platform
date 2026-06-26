@@ -41,7 +41,7 @@ const UserProfilePage = async () => {
         <Avatar
           // 🟢 অপশনাল চেইনিং ব্যবহার করা হয়েছে যাতে ইমেজ নাল হলেও এরর না আসে
           src={user?.image || "https://i.pravatar.cc/150?u=a042581f4e29026704d"}
-          className="w-24 h-24 text-large border-2 border-blue-500/30 shadow-md border-10 border-blue-500/30 shadow-md"
+          className="w-24 h-24 text-large border-8 border-blue-500/30 shadow-md  border-blue-500/30 shadow-md"
           
           radius="xl"
           color={roleColor}
