@@ -55,6 +55,18 @@ const AdminTicketManagePage = () => {
     }
   };
 
+  // স্ট্যাটাস ব্যাজের জন্য ক্লাসের হেল্পার ফাংশন
+  const getStatusBadgeClass = (status) => {
+    const currentStatus = status?.toLowerCase() || 'pending';
+    if (currentStatus === 'approved') {
+      return 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400';
+    }
+    if (currentStatus === 'rejected') {
+      return 'bg-rose-100 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400';
+    }
+    return 'bg-amber-100 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400';
+  };
+
   return (
     <div className="w-full max-w-7xl mx-auto p-4 md:p-6 space-y-6" style={{ fontFamily: 'sans-serif' }}>
       
@@ -70,67 +82,65 @@ const AdminTicketManagePage = () => {
         </div>
       ) : (
         <>
-          {/* 📱 মোবাইল এবং ট্যাবলেট ভিউ (Card Layout) - 'md' স্ক্রিনের নিচে দেখাবে */}
-          <div className="grid grid-cols-1 gap-4 md:hidden">
+          {/* 📱 📑 মোবাইল এবং ট্যাবলেট ভিউ (Responsive Card Layout) */}
+          {/* small এ ১টি কার্ড, md (ট্যাবলেট) এ ২টি করে কার্ড পাশাপাশি বসবে, lg এ লুকিয়ে যাবে */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:hidden">
             {tickets.map((ticket) => (
               <div 
                 key={ticket._id}
-                className="p-5 border border-gray-100 dark:border-neutral-800 bg-white dark:bg-neutral-900 rounded-2xl shadow-sm space-y-4 relative"
+                className="p-5 border border-gray-100 dark:border-neutral-800 bg-white dark:bg-neutral-900 rounded-2xl shadow-sm space-y-4 flex flex-col justify-between"
               >
-                {/* টিকিট ইমেজ ও টাইটেল */}
-                <div className="flex items-center gap-3">
-                  {ticket.image && (
-                    <img 
-                      src={ticket.image} 
-                      className="w-12 h-12 rounded-xl object-cover border border-gray-100 dark:border-neutral-800 shrink-0" 
-                      alt="" 
-                    />
-                  )}
-                  <div>
-                    <h4 className={`font-bold text-base ${title}`}>{ticket.title}</h4>
-                    <p className="text-xs text-gray-500 dark:text-neutral-400 font-medium mt-0.5">
-                      {ticket.fromLocation} ➔ {ticket.toLocation}
-                    </p>
+                <div className="space-y-4">
+                  {/* টিকিট ইমেজ ও টাইটেল */}
+                  <div className="flex items-center gap-3">
+                    {ticket.image && (
+                      <img 
+                        src={ticket.image} 
+                        className="w-12 h-12 rounded-xl object-cover border border-gray-100 dark:border-neutral-800 shrink-0" 
+                        alt="" 
+                      />
+                    )}
+                    <div className="min-w-0">
+                      <h4 className={`font-bold text-base truncate ${title}`}>{ticket.title}</h4>
+                      <p className="text-xs text-gray-500 dark:text-neutral-400 font-medium mt-0.5">
+                        {ticket.fromLocation} ➔ {ticket.toLocation}
+                      </p>
+                    </div>
                   </div>
-                </div>
 
-                {/* প্রাইস, কোয়ান্টিটি ও স্ট্যাটাস গ্রিড */}
-                <div className="grid grid-cols-3 gap-2 pt-3 border-t border-gray-50 dark:border-neutral-800/40 text-xs">
-                  <div>
-                    <p className="text-gray-400 font-medium">Price</p>
-                    <p className={`font-bold text-sm mt-0.5 ${title}`}>৳{ticket.price}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-400 font-medium">Quantity</p>
-                    <p className={`font-bold text-sm mt-0.5 ${text}`}>{ticket.quantity} Pcs</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-gray-400 font-medium mb-1">Status</p>
-                    <span 
-                      className={`px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide inline-block
-                        ${ticket.verificationStatus === 'approved' ? 'bg-success-100 dark:bg-success-900/30 text-success-700 dark:text-success-400' : 
-                          ticket.verificationStatus === 'rejected' ? 'bg-danger-100 dark:bg-danger-900/30 text-danger-700 dark:text-danger-400' : 
-                          'bg-warning-100 dark:bg-warning-900/30 text-warning-700 dark:text-warning-400'}`}
-                    >
-                      {ticket.verificationStatus || 'pending'}
-                    </span>
+                  {/* প্রাইস, কোয়ান্টিটি ও স্ট্যাটাস গ্রিড */}
+                  <div className="grid grid-cols-3 gap-2 pt-3 border-t border-gray-50 dark:border-neutral-800/40 text-xs">
+                    <div>
+                      <p className="text-gray-400 font-medium">Price</p>
+                      <p className={`font-bold text-sm mt-0.5 ${title}`}>৳{ticket.price}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-400 font-medium">Quantity</p>
+                      <p className={`font-bold text-sm mt-0.5 ${text}`}>{ticket.quantity} Pcs</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-gray-400 font-medium mb-1">Status</p>
+                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide inline-block ${getStatusBadgeClass(ticket.verificationStatus)}`}>
+                        {ticket.verificationStatus || 'pending'}
+                      </span>
+                    </div>
                   </div>
                 </div>
 
                 {/* ভেন্ডর ইনফো এবং অ্যাকশন বাটন */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-gray-50 dark:border-neutral-800/40">
+                <div className="space-y-3 pt-3 border-t border-gray-50 dark:border-neutral-800/40">
                   <div className="bg-gray-50/50 dark:bg-neutral-800/20 p-2.5 rounded-xl">
                     <p className="text-[10px] text-purple-500 font-bold uppercase tracking-wider">Vendor</p>
                     <p className={`font-semibold text-xs mt-0.5 ${text}`}>{ticket.vendorName}</p>
-                    <p className={`${muted} text-[11px] truncate max-w-[200px]`}>{ticket.vendorEmail}</p>
+                    <p className={`${muted} text-[11px] truncate`}>{ticket.vendorEmail}</p>
                   </div>
 
-                  {/* মোবাইল বাটনগ্রুপ */}
-                  <div className="flex gap-2 justify-end shrink-0">
+                  {/* মোবাইল ও ট্যাবলেট অ্যাকশন বাটনগ্রুপ */}
+                  <div className="flex gap-2 justify-end w-full">
                     <button
                       disabled={ticket.verificationStatus === 'approved' || loadingId !== null}
                       onClick={() => handleStatusUpdate(ticket._id, 'approved')}
-                      className="bg-emerald-500 hover:bg-emerald-600 disabled:opacity-40 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-all active:scale-95 shadow-sm"
+                      className="flex-1 sm:flex-none text-center bg-emerald-500 hover:bg-emerald-600 disabled:opacity-40 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-all active:scale-95 shadow-sm"
                     >
                       {loadingId === `${ticket._id}-approved` ? '...' : 'Approve'}
                     </button>
@@ -138,7 +148,7 @@ const AdminTicketManagePage = () => {
                     <button
                       disabled={ticket.verificationStatus === 'rejected' || loadingId !== null}
                       onClick={() => handleStatusUpdate(ticket._id, 'rejected')}
-                      className="bg-rose-500 hover:bg-rose-600 disabled:opacity-40 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-all active:scale-95 shadow-sm"
+                      className="flex-1 sm:flex-none text-center bg-rose-500 hover:bg-rose-600 disabled:opacity-40 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-all active:scale-95 shadow-sm"
                     >
                       {loadingId === `${ticket._id}-rejected` ? '...' : 'Reject'}
                     </button>
@@ -148,8 +158,8 @@ const AdminTicketManagePage = () => {
             ))}
           </div>
 
-          {/* 💻 ডেস্কটপ ভিউ (Premium Table Layout) - 'md' এবং বড় স্ক্রিনের জন্য */}
-          <div className={`${card} hidden md:block overflow-x-auto shadow-md rounded-2xl border border-gray-100 dark:border-neutral-800 bg-white dark:bg-neutral-900`}>
+          {/* 💻 ডেস্কটপ ভিউ (Premium Table Layout) - শুধুমাত্র 'lg' এবং তার বড় স্ক্রিনের জন্য */}
+          <div className={`${card} hidden lg:block overflow-x-auto shadow-md rounded-2xl border border-gray-100 dark:border-neutral-800 bg-white dark:bg-neutral-900`}>
             <table className="w-full border-collapse text-left">
               <thead>
                 <tr className="bg-gray-50/70 dark:bg-neutral-950 border-b border-gray-100 dark:border-neutral-800 text-xs uppercase tracking-wider font-bold text-gray-600 dark:text-neutral-400">
@@ -205,12 +215,7 @@ const AdminTicketManagePage = () => {
 
                     {/* Status Badge */}
                     <td className="p-4">
-                      <span 
-                        className={`px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide
-                          ${ticket.verificationStatus === 'approved' ? 'bg-success-100 dark:bg-success-900/30 text-success-700 dark:text-success-400' : 
-                            ticket.verificationStatus === 'rejected' ? 'bg-danger-100 dark:bg-danger-900/30 text-danger-700 dark:text-danger-400' : 
-                            'bg-warning-100 dark:bg-warning-900/30 text-warning-700 dark:text-warning-400'}`}
-                      >
+                      <span className={`px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide ${getStatusBadgeClass(ticket.verificationStatus)}`}>
                         {ticket.verificationStatus || 'pending'}
                       </span>
                     </td>
