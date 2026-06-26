@@ -2,18 +2,17 @@ import React from 'react';
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { Avatar, Chip } from "@heroui/react";
-import { Person, Envelope, ShieldCheck, Calendar } from "@gravity-ui/icons";
-// আপনার ডিজাইন টোকেনসমূহ ইমপোর্ট করুন
+import { Person, Envelope, ShieldCheck } from "@gravity-ui/icons"; // অপ্রয়োজনীয় Calendar রিমুভ করা হয়েছে
 import { card, title, text, muted } from "@/styles/ui";
 
 const UserProfilePage = async () => {
-  // সার্ভার সাইডে সেশন পাওয়া
+  // সার্ভার সাইডে সেশন পাওয়া
   const session = await auth.api.getSession({
-    headers: await headers(), // headers() একটি প্রমিজ রিটার্ন করে (Next.js 15+)
+    headers: await headers(), 
   });
 
   // যদি সেশন না থাকে (লগইন করা নাই)
-  if (!session) {
+  if (!session || !session.user) {
     return (
       <div className="flex items-center justify-center min-h-[60vh] px-4">
         <div className={`w-full max-w-md p-6 text-center border ${card}`}>
@@ -25,31 +24,34 @@ const UserProfilePage = async () => {
 
   const user = session.user;
 
-  // ইউজারের রোলের উপর ভিত্তি করে চিপ (Badge) এর কালার সেট করা
+  // 🟢 ইউজারের রোলের উপর ভিত্তি করে সেফলি কালার সেট করা
+  const userRole = user?.role?.toLowerCase() || "user";
   const roleColor = 
-    user.role === "admin" ? "danger" : 
-    user.role === "vendor" ? "warning" : "primary";
+    userRole === "admin" ? "danger" : 
+    userRole === "vendor" ? "warning" : "primary";
 
   return (
     <div className="w-full max-w-4xl mx-auto p-4 md:p-6 space-y-6 transition-colors relative">
       
-      {/* Background Decorative Glow (ডার্ক মোডে লাক্সারি ভাইব দেওয়ার জন্য) */}
+      {/* Background Decorative Glow */}
       <div className="absolute w-[300px] h-[300px] bg-indigo-600/5 dark:bg-indigo-600/10 rounded-full blur-[80px] top-0 right-1/4 pointer-events-none" />
 
       {/* প্রোফাইল হেডার কার্ড */}
       <div className={`p-6 md:p-8 flex flex-col sm:flex-row items-center gap-6 shadow-xl relative z-10 ${card}`}>
         <Avatar
-          src={user.image || "https://i.pravatar.cc/150?u=a042581f4e29026704d"}
-          className="w-24 h-24 text-large border-2 border-blue-500/30 shadow-md"
-          isBordered
+          // 🟢 অপশনাল চেইনিং ব্যবহার করা হয়েছে যাতে ইমেজ নাল হলেও এরর না আসে
+          src={user?.image || "https://i.pravatar.cc/150?u=a042581f4e29026704d"}
+          className="w-24 h-24 text-large border-2 border-blue-500/30 shadow-md border-10 border-blue-500/30 shadow-md"
+          
           radius="xl"
           color={roleColor}
+          name={user?.name || "User"} // HeroUI ফলব্যাক নেম সাপোর্ট করে যদি ইমেজ ব্ল্যাঙ্ক থাকে
         />
         
         <div className="flex-1 text-center sm:text-left space-y-2">
           <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
             <h1 className={`text-2xl md:text-3xl font-extrabold tracking-tight ${title}`}>
-              {user.name}
+              {user?.name}
             </h1>
             <div className="mx-auto sm:mx-0">
               <Chip 
@@ -58,13 +60,13 @@ const UserProfilePage = async () => {
                 size="sm" 
                 className="capitalize font-semibold rounded-lg"
               >
-                {user.role || "User"}
+                {user?.role || "User"}
               </Chip>
             </div>
           </div>
           <p className={`text-sm md:text-base flex items-center justify-center sm:justify-start gap-2 ${muted}`}>
             <Envelope className="size-4 opacity-80" />
-            {user.email}
+            {user?.email}
           </p>
         </div>
       </div>
@@ -80,11 +82,11 @@ const UserProfilePage = async () => {
           <div className="space-y-4">
             <div>
               <p className={`text-xs uppercase tracking-wider font-semibold ${muted}`}>Full Name</p>
-              <p className={`text-base font-medium mt-0.5 ${text}`}>{user.name}</p>
+              <p className={`text-base font-medium mt-0.5 ${text}`}>{user?.name}</p>
             </div>
             <div>
               <p className={`text-xs uppercase tracking-wider font-semibold ${muted}`}>Email Address</p>
-              <p className={`text-base font-medium mt-0.5 ${text}`}>{user.email}</p>
+              <p className={`text-base font-medium mt-0.5 ${text}`}>{user?.email}</p>
             </div>
           </div>
         </div>
@@ -98,7 +100,7 @@ const UserProfilePage = async () => {
             <div>
               <p className={`text-xs uppercase tracking-wider font-semibold ${muted}`}>Account Role</p>
               <p className={`text-base font-semibold mt-1 capitalize text-${roleColor === 'danger' ? 'red' : roleColor === 'warning' ? 'amber' : 'blue'}-500`}>
-                {user.role || "Standard Customer"}
+                {user?.role || "Standard Customer"}
               </p>
             </div>
             <div>

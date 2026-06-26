@@ -28,7 +28,7 @@ export default function RootLayout({ children }) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`} // ✅ 'dark' সরানো হয়েছে
       suppressHydrationWarning
     >
-      <body className="bg-background text-foreground min-h-full flex flex-col">
+      <body className="bg-background text-foreground min-h-full flex flex-col" suppressHydrationWarning={true}>
     <NextThemeProviders>
 
       <AppNavbar />
