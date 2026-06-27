@@ -6,7 +6,7 @@ import { card, title, text, muted, buttonPrimary } from "@/styles/ui";
 import { TicketActions } from '@/components/dashboard/vendor/TicketActions';
 
 
-
+export const dynamic = 'force-dynamic';
 const getStatusChip = (status) => {
   switch (status?.toLowerCase()) {
     case 'approved':

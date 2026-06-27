@@ -16,23 +16,39 @@ const TicketDetailsPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [bookingQty, setBookingQty] = useState(1);
   const [submitting, setSubmitting] = useState(false);
+
   
-  // কাউন্টডাউন স্টেট
+
+ 
   const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0, isExpired: false });
 
   const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
-  // ডামি ইউজার ডেটা (রিয়েল অ্যাপে এটি আপনার Auth Context বা সেসশন থেকে আসবে)
+ 
 
   const {data:cutrrentUser}=  authClient.useSession();
   const user=cutrrentUser?.user;
   const currentUser = { name: user?.name, email: user?.email };
   // const currentUser = { name: "Moajjem Hossain", email: "moajjem@example.com" }; 
 
-  // ১. টিকিটের ডিটেইলস ডেটা লোড করা
+
   useEffect(() => {
     const fetchTicketDetails = async () => {
       try {
-        const res = await fetch(`${serverUrl}/admin/all-tickets`, { cache: 'no-store' });
+        const { data: tokenData } = await authClient.token();
+                const token = tokenData?.token;
+        
+                
+                if (!token) {
+                  console.warn("No token found, skipping fetch");
+                  return; 
+                }
+        
+                const res = await fetch(`${serverUrl}/admin/all-tickets`, {
+                  cache: 'no-store',
+                  headers: {
+                    authorization: `Bearer ${token}`,
+                  }
+                });
         if (res.ok) {
           const data = await res.json();
           const foundTicket = data.find(t => t._id === id);

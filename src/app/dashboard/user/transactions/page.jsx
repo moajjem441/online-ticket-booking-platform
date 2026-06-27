@@ -49,44 +49,49 @@ const TransactionHistory = () => {
         </div>
       ) : (
         <>
-          {/* 📱 মোবাইল এবং ট্যাবলেট ভিউ (কার্ড লেআউট) - শুধুমাত্র md স্ক্রিনের নিচে দেখাবে */}
-          <div className="grid grid-cols-1 gap-4 md:hidden">
+          {/* 📱 📑 মোবাইল এবং ট্যাবলেট ভিউ (Responsive Card Layout) */}
+          {/* মোবাইলে ১টি করে এবং ট্যাবলেটে (md) ২টি করে কার্ড পাশাপাশি বসবে। ডেস্কটপে (lg) হাইড থাকবে */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:hidden">
             {transactions.map((tx, index) => (
               <div 
                 key={tx._id} 
-                className="p-5 border border-gray-100 dark:border-neutral-800 bg-white dark:bg-neutral-900 rounded-2xl shadow-sm space-y-3 relative overflow-hidden"
+                className="p-5 border border-gray-100 dark:border-neutral-800 bg-white dark:bg-neutral-900 rounded-2xl shadow-sm space-y-4 flex flex-col justify-between relative overflow-hidden"
               >
-                {/* কার্ডের উপরের ইনফো */}
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-gray-400">#{index + 1}</span>
-                  <span className="px-2.5 py-0.5 text-[10px] font-extrabold uppercase bg-green-100 text-green-950 border border-green-400 dark:bg-green-950/40 dark:text-green-300 dark:border-green-800 rounded-full shadow-sm">
-                    SUCCESS
-                  </span>
-                </div>
-
-                {/* টিকিট টাইটেল ও অ্যামাউন্ট */}
-                <div className="flex justify-between items-start gap-2">
-                  <div>
-                    <p className="text-xs text-gray-400 font-medium">Ticket Title</p>
-                    <h4 className="font-bold text-gray-800 dark:text-neutral-100 text-base mt-0.5">{tx.ticketTitle}</h4>
+                <div className="space-y-3">
+                  {/* কার্ডের উপরের ইনফো */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-gray-400">#{index + 1}</span>
+                    <span className="px-2.5 py-0.5 text-[10px] font-extrabold uppercase bg-green-100 text-green-950 border border-green-400 dark:bg-green-950/40 dark:text-green-300 dark:border-green-800 rounded-full shadow-sm">
+                      SUCCESS
+                    </span>
                   </div>
-                  <div className="text-right shrink-0">
-                    <p className="text-xs text-gray-400 font-medium">Amount</p>
-                    <p className="font-black text-green-600 dark:text-green-400 text-base mt-0.5">৳{tx.totalPrice}</p>
+
+                  {/* টিকিট টাইটেল ও অ্যামাউন্ট */}
+                  <div className="flex justify-between items-start gap-3">
+                    <div className="min-w-0">
+                      <p className="text-xs text-gray-400 font-medium">Ticket Title</p>
+                      <h4 className="font-bold text-gray-800 dark:text-neutral-100 text-base mt-0.5 truncate" title={tx.ticketTitle}>
+                        {tx.ticketTitle}
+                      </h4>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="text-xs text-gray-400 font-medium">Amount</p>
+                      <p className="font-black text-green-600 dark:text-green-400 text-base mt-0.5">৳{tx.totalPrice}</p>
+                    </div>
                   </div>
                 </div>
 
                 {/* ট্রানজেকশন আইডি এবং ডেট */}
-                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-gray-50 dark:border-neutral-800/50 text-xs">
-                  <div>
+                <div className="grid grid-cols-2 gap-2 pt-3 border-t border-gray-50 dark:border-neutral-800/50 text-xs">
+                  <div className="min-w-0">
                     <p className="text-gray-400 font-medium">Transaction ID</p>
-                    <p className="font-mono text-blue-600 dark:text-blue-400 font-semibold mt-0.5 truncate max-w-[130px]" title={tx._id}>
+                    <p className="font-mono text-blue-600 dark:text-blue-400 font-semibold mt-0.5 truncate" title={tx._id}>
                       {tx._id}
                     </p>
                   </div>
-                  <div className="text-right">
+                  <div className="text-right min-w-0">
                     <p className="text-gray-400 font-medium">Payment Date</p>
-                    <p className="text-gray-500 dark:text-neutral-400 font-medium mt-0.5">
+                    <p className="text-gray-500 dark:text-neutral-400 font-medium mt-0.5 truncate">
                       {tx.departureDate || new Date().toLocaleDateString()}
                     </p>
                   </div>
@@ -95,8 +100,8 @@ const TransactionHistory = () => {
             ))}
           </div>
 
-          {/* 💻 ডেস্কটপ ভিউ (প্রফেশনাল টেবিল) - মাঝারি এবং বড় স্ক্রিনে দেখাবে */}
-          <div className="hidden md:block overflow-x-auto rounded-2xl border border-gray-100 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm">
+          {/* 💻 ডেস্কটপ ভিউ (প্রফেশনাল টেবিল) - শুধুমাত্র 'lg' এবং তার বড় স্ক্রিনের জন্য */}
+          <div className="hidden lg:block overflow-x-auto rounded-2xl border border-gray-100 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm">
             <table className="table w-full text-left border-collapse">
               <thead className="bg-gray-50/70 dark:bg-neutral-950 text-gray-600 dark:text-neutral-400 text-xs uppercase font-bold tracking-wider">
                 <tr>

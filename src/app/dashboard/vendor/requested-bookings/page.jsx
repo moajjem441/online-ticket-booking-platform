@@ -28,7 +28,7 @@ const RequestedBookingsPage = () => {
 
   // 2. Handle accept/reject
   const handleBookingAction = async (bookingId, ticketId, bookingQuantity, action) => {
-    setLoadingId(bookingId);
+    setLoadingId(bookingId + '-' + action);
     try {
       const res = await fetch(`${serverUrl}/vendor/bookings/status/${bookingId}`, {
         method: "PATCH",
@@ -77,44 +77,47 @@ const RequestedBookingsPage = () => {
         </div>
       ) : (
         <>
-          {/* 📱 মোবাইল এবং ট্যাবলেট ভিউ (Responsive Card Layout) - 'md' স্ক্রিনের নিচে দেখাবে */}
-          <div className="grid grid-cols-1 gap-4 md:hidden">
+          {/* 📱 📑 মোবাইল এবং ট্যাবলেট ভিউ (Responsive Card Layout) */}
+          {/* মোবাইলে ১টি করে এবং ট্যাবলেটে (md) ২টি করে কার্ড পাশাপাশি বসবে। ডেস্কটপে (lg) হাইড থাকবে */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:hidden">
             {bookings.map((booking) => (
               <div 
                 key={booking._id}
-                className="p-5 border border-gray-100 dark:border-neutral-800 bg-white dark:bg-neutral-900 rounded-2xl shadow-sm space-y-4 relative"
+                className="p-5 border border-gray-100 dark:border-neutral-800 bg-white dark:bg-neutral-900 rounded-2xl shadow-sm space-y-4 flex flex-col justify-between"
               >
-                {/* কাস্টমার ইনফো */}
-                <div>
-                  <span className="text-[10px] uppercase tracking-wider font-bold text-purple-500 bg-purple-50 dark:bg-purple-950/30 px-2 py-0.5 rounded-md">
-                    Customer Info
-                  </span>
-                  <h4 className="font-bold text-gray-900 dark:text-neutral-100 text-base mt-1.5">
-                    {booking.userName || 'Customer'}
-                  </h4>
-                  <p className="text-gray-500 dark:text-neutral-400 text-xs font-light">
-                    {booking.userEmail}
-                  </p>
-                </div>
-
-                {/* টিকিট ও কোয়ান্টিটি গ্রিড */}
-                <div className="grid grid-cols-2 gap-3 pt-3 border-t border-gray-50 dark:border-neutral-800/40">
+                <div className="space-y-4">
+                  {/* কাস্টমার ইনফো */}
                   <div>
-                    <p className="text-xs text-gray-400 font-medium">Ticket / Route</p>
-                    <p className="font-semibold text-gray-800 dark:text-neutral-200 text-sm mt-0.5">
-                      {booking.ticketTitle}
+                    <span className="text-[10px] uppercase tracking-wider font-bold text-purple-500 bg-purple-50 dark:bg-purple-950/30 px-2 py-0.5 rounded-md inline-block">
+                      Customer Info
+                    </span>
+                    <h4 className={`font-bold text-base mt-1.5 truncate ${title}`}>
+                      {booking.userName || 'Customer'}
+                    </h4>
+                    <p className={`${muted} text-xs font-light truncate`}>
+                      {booking.userEmail}
                     </p>
                   </div>
-                  <div className="text-right">
-                    <p className="text-xs text-gray-400 font-medium">Quantity</p>
-                    <p className="font-black text-gray-900 dark:text-white text-sm mt-0.5">
-                      {booking.bookingQuantity} <span className="text-xs font-normal text-gray-500">Pcs</span>
-                    </p>
+
+                  {/* টিকিট ও কোয়ান্টিটি গ্রিড */}
+                  <div className="grid grid-cols-2 gap-3 pt-3 border-t border-gray-50 dark:border-neutral-800/40">
+                    <div className="min-w-0">
+                      <p className="text-xs text-gray-400 font-medium">Ticket / Route</p>
+                      <p className={`font-semibold text-sm mt-0.5 truncate ${text}`}>
+                        {booking.ticketTitle}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs text-gray-400 font-medium">Quantity</p>
+                      <p className={`font-black text-sm mt-0.5 ${title}`}>
+                        {booking.bookingQuantity} <span className="text-xs font-normal text-gray-500">Pcs</span>
+                      </p>
+                    </div>
                   </div>
                 </div>
 
                 {/* প্রাইস এবং অ্যাকশন বাটন সেকশন */}
-                <div className="flex items-center justify-between pt-3 border-t border-gray-50 dark:border-neutral-800/40">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-gray-50 dark:border-neutral-800/40">
                   <div>
                     <p className="text-xs text-gray-400 font-medium">Total Price</p>
                     <p className="font-extrabold text-blue-600 dark:text-blue-400 text-lg">
@@ -122,21 +125,21 @@ const RequestedBookingsPage = () => {
                     </p>
                   </div>
 
-                  {/* মোবাইল অ্যাকশন বাটনসমূহ */}
-                  <div className="flex gap-2 shrink-0">
+                  {/* মোবাইল ও ট্যাবলেট অ্যাকশন বাটনসমূহ */}
+                  <div className="flex gap-2 justify-end w-full sm:w-auto shrink-0">
                     <button
                       disabled={loadingId !== null}
                       onClick={() => handleBookingAction(booking._id, booking.ticketId, booking.bookingQuantity, 'accepted')}
-                      className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-600/50 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition-all active:scale-95"
+                      className="flex-1 sm:flex-none text-center bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-all active:scale-95 shadow-sm"
                     >
-                      {loadingId === booking._id ? '...' : 'Accept'}
+                      {loadingId === `${booking._id}-accepted` ? '...' : 'Accept'}
                     </button>
                     <button
                       disabled={loadingId !== null}
                       onClick={() => handleBookingAction(booking._id, booking.ticketId, booking.bookingQuantity, 'rejected')}
-                      className="bg-rose-600 hover:bg-rose-700 disabled:bg-rose-600/50 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition-all active:scale-95"
+                      className="flex-1 sm:flex-none text-center bg-rose-600 hover:bg-rose-700 disabled:opacity-40 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-all active:scale-95 shadow-sm"
                     >
-                      Reject
+                      {loadingId === `${booking._id}-rejected` ? '...' : 'Reject'}
                     </button>
                   </div>
                 </div>
@@ -144,8 +147,8 @@ const RequestedBookingsPage = () => {
             ))}
           </div>
 
-          {/* 💻 ডেস্কটপ ভিউ (Premium Table Layout) - মাঝারি এবং বড় স্ক্রিনের জন্য */}
-          <div className={`${card} hidden md:block overflow-x-auto shadow-md rounded-2xl border border-gray-100 dark:border-neutral-800 bg-white dark:bg-neutral-900`}>
+          {/* 💻 ডেস্কটপ ভিউ (Premium Table Layout) - শুধুমাত্র 'lg' এবং তার বড় স্ক্রিনের জন্য */}
+          <div className={`${card} hidden lg:block overflow-x-auto shadow-md rounded-2xl border border-gray-100 dark:border-neutral-800 bg-white dark:bg-neutral-900`}>
             <table className="w-full border-collapse text-left">
               <thead>
                 <tr className="bg-gray-50/70 dark:bg-neutral-950 border-b border-gray-100 dark:border-neutral-800 text-xs uppercase tracking-wider font-bold text-gray-600 dark:text-neutral-400">
@@ -164,21 +167,23 @@ const RequestedBookingsPage = () => {
                   >
                     {/* User Info */}
                     <td className="p-4">
-                      <p className="font-bold text-gray-900 dark:text-neutral-100 m-0">
-                        {booking.userName || 'Customer'}
-                      </p>
-                      <p className="text-gray-500 dark:text-neutral-400 m-0 text-xs mt-0.5 font-light">
-                        {booking.userEmail}
-                      </p>
+                      <div className="min-w-0">
+                        <p className={`font-bold m-0 ${title}`}>
+                          {booking.userName || 'Customer'}
+                        </p>
+                        <p className={`m-0 text-xs mt-0.5 font-light ${muted}`}>
+                          {booking.userEmail}
+                        </p>
+                      </div>
                     </td>
 
                     {/* Ticket Title */}
-                    <td className="p-4 font-semibold text-gray-800 dark:text-neutral-200">
+                    <td className={`p-4 font-semibold ${text}`}>
                       {booking.ticketTitle}
                     </td>
 
                     {/* Booking Qty */}
-                    <td className="p-4 text-center font-black text-gray-900 dark:text-white">
+                    <td className={`p-4 text-center font-black ${title}`}>
                       {booking.bookingQuantity} <span className="text-xs font-normal text-gray-500">Pcs</span>
                     </td>
 
@@ -193,18 +198,16 @@ const RequestedBookingsPage = () => {
                         <button
                           disabled={loadingId !== null}
                           onClick={() => handleBookingAction(booking._id, booking.ticketId, booking.bookingQuantity, 'accepted')}
-                          className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-600/50 text-white font-bold text-xs px-4 py-2 rounded-lg transition-all shadow-sm active:scale-95"
-                          style={{ border: 'none', cursor: loadingId !== null ? 'not-allowed' : 'pointer' }}
+                          className="bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 text-white font-bold text-xs px-4 py-2 rounded-lg transition-colors active:scale-95 shadow-sm"
                         >
-                          {loadingId === booking._id ? 'Processing...' : 'Accept'}
+                          {loadingId === `${booking._id}-accepted` ? '...' : 'Accept'}
                         </button>
                         <button
                           disabled={loadingId !== null}
                           onClick={() => handleBookingAction(booking._id, booking.ticketId, booking.bookingQuantity, 'rejected')}
-                          className="bg-rose-600 hover:bg-rose-700 disabled:bg-rose-600/50 text-white font-bold text-xs px-4 py-2 rounded-lg transition-all shadow-sm active:scale-95"
-                          style={{ border: 'none', cursor: loadingId !== null ? 'not-allowed' : 'pointer' }}
+                          className="bg-rose-600 hover:bg-rose-700 disabled:opacity-40 text-white font-bold text-xs px-4 py-2 rounded-lg transition-colors active:scale-95 shadow-sm"
                         >
-                          Reject
+                          {loadingId === `${booking._id}-rejected` ? '...' : 'Reject'}
                         </button>
                       </div>
                     </td>

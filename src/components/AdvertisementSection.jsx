@@ -4,30 +4,48 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { card, text, title, muted } from "@/styles/ui";
 
+import { authClient } from '@/lib/auth-client'
+
 const AdvertisementSection = () => {
   const router = useRouter();
   const [adTickets, setAdTickets] = useState([]);
   const [loading, setLoading] = useState(true);
   const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
 
-  useEffect(() => {
-    const fetchAdvertisedTickets = async () => {
-      try {
-        const res = await fetch(`${serverUrl}/admin/all-tickets`, { cache: 'no-store' });
-        if (res.ok) {
-          const data = await res.json();
-          // অ্যাডমিনের সিলেক্ট করা (isAdvertised: true) সর্বোচ্চ ৬টি টিকিট ফিল্টার
-          const filteredAds = data.filter(ticket => ticket.isAdvertised === true).slice(0, 6);
-          setAdTickets(filteredAds);
-        }
-      } catch (error) {
-        console.error("Error fetching advertised tickets:", error);
-      } finally {
-        setLoading(false);
+
+  
+
+ useEffect(() => {
+  const fetchAdvertisedTickets = async () => {
+    try {
+      const res = await fetch(`${serverUrl}/all-tickets`, {
+        cache: 'no-store'
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+
+        const filteredAds = data
+          .filter(ticket => ticket.isAdvertised === true)
+          .slice(0, 6);
+
+        setAdTickets(filteredAds);
       }
-    };
+    } catch (error) {
+      console.error("Error fetching advertised tickets:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  setTimeout(() => {
     fetchAdvertisedTickets();
-  }, [serverUrl]);
+  }, 2000);
+
+}, [serverUrl]);
+
+
+
 
   if (loading) return <div className="text-center py-10 text-sm text-gray-500 bg-white dark:bg-[#0d0811]">Loading Featured Offers...</div>;
   if (adTickets.length === 0) return null; // কোনো বিজ্ঞাপন না থাকলে সেকশনটি হাইড থাকবে

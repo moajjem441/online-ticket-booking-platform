@@ -4,7 +4,9 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { card, text, title, muted } from "@/styles/ui";
 
-const AllTicketsPage = () => {
+
+
+const AllTicketsPage =  () => {
   const router = useRouter();
   const [tickets, setTickets] = useState([]);
   const [filteredTickets, setFilteredTickets] = useState([]);
@@ -22,11 +24,19 @@ const AllTicketsPage = () => {
 
   const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
 
+  
+
+
+
   // ১. শুধুমাত্র Admin Approved টিকিটগুলো লোড করা
   useEffect(() => {
     const fetchApprovedTickets = async () => {
       try {
-        const res = await fetch(`${serverUrl}/admin/all-tickets`, { cache: 'no-store' });
+       
+        
+                const res = await fetch(`${serverUrl}/all-tickets`, {
+                  cache: 'no-store'
+                });
         if (res.ok) {
           const data = await res.json();
           const approvedOnly = data.filter(

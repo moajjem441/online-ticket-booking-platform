@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation';
 import { card, text, title, muted } from "@/styles/ui";
 import toast from 'react-hot-toast';
 
+import { authClient } from '@/lib/auth-client'
+
+
 const AdminAdvertiseTicketsPage = () => {
   const router = useRouter();
   const [tickets, setTickets] = useState([]);
@@ -12,10 +15,20 @@ const AdminAdvertiseTicketsPage = () => {
 
   const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
 
+
+ 
+
+
+
+
   // ১. শুধুমাত্র Admin Approved টিকিটগুলো লোড করার ফাংশন
   const fetchApprovedTickets = async () => {
     try {
-      const res = await fetch(`${serverUrl}/admin/all-tickets`, { cache: 'no-store' });
+      
+      
+              const res = await fetch(`${serverUrl}/all-tickets`, {
+                cache: 'no-store'
+              });
       if (res.ok) {
         const data = await res.json();
         const approvedOnly = data.filter(ticket => ticket.verificationStatus?.toLowerCase() === 'approved');
@@ -75,61 +88,64 @@ const AdminAdvertiseTicketsPage = () => {
         </div>
       ) : (
         <>
-          {/* 📱 মোবাইল এবং ট্যাবলেট ভিউ (Card Layout) - 'md' স্ক্রিনের নিচে দেখাবে */}
-          <div className="grid grid-cols-1 gap-4 md:hidden">
+          {/* 📱 📑 মোবাইল এবং ট্যাবলেট ভিউ (Responsive Card Layout) */}
+          {/* small স্ক্রিনে ১টি কার্ড, md (ট্যাবলেট) এ ২টি করে কার্ড পাশাপাশি বসবে, lg এ লুকিয়ে যাবে */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:hidden">
             {tickets.map((ticket) => (
               <div 
                 key={ticket._id}
-                className="p-5 border border-gray-100 dark:border-neutral-800 bg-white dark:bg-neutral-900 rounded-2xl shadow-sm space-y-4 relative"
+                className="p-5 border border-gray-100 dark:border-neutral-800 bg-white dark:bg-neutral-900 rounded-2xl shadow-sm space-y-4 flex flex-col justify-between"
               >
-                {/* ইমেজ, টাইটেল ও রুট */}
-                <div className="flex items-center gap-3">
-                  {ticket.image && (
-                    <img 
-                      src={ticket.image} 
-                      className="w-12 h-12 rounded-xl object-cover border border-gray-100 dark:border-neutral-800 shrink-0" 
-                      alt="" 
-                    />
-                  )}
-                  <div>
-                    <h4 className={`font-bold text-base ${title}`}>{ticket.title}</h4>
-                    <p className="text-xs text-gray-500 dark:text-neutral-400 font-medium mt-0.5">
-                      {ticket.fromLocation} ➔ {ticket.toLocation}
-                    </p>
+                <div className="space-y-4">
+                  {/* ইমেজ, টাইটেল ও রুট */}
+                  <div className="flex items-center gap-3">
+                    {ticket.image && (
+                      <img 
+                        src={ticket.image} 
+                        className="w-12 h-12 rounded-xl object-cover border border-gray-100 dark:border-neutral-800 shrink-0" 
+                        alt="" 
+                      />
+                    )}
+                    <div className="min-w-0">
+                      <h4 className={`font-bold text-base truncate ${title}`}>{ticket.title}</h4>
+                      <p className="text-xs text-gray-500 dark:text-neutral-400 font-medium mt-0.5">
+                        {ticket.fromLocation} ➔ {ticket.toLocation}
+                      </p>
+                    </div>
                   </div>
-                </div>
 
-                {/* প্রাইস ও অ্যাড স্ট্যাটাস গ্রিড */}
-                <div className="grid grid-cols-2 gap-2 pt-3 border-t border-gray-50 dark:border-neutral-800/40 text-xs">
-                  <div>
-                    <p className="text-gray-400 font-medium">Price</p>
-                    <p className={`font-extrabold text-blue-600 dark:text-blue-400 text-sm mt-0.5`}>৳{ticket.price}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-gray-400 font-medium mb-1">Ad Status</p>
-                    <span 
-                      className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide inline-block
-                        ${ticket.isAdvertised ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400' : 'bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-neutral-400'}`}
-                    >
-                      {ticket.isAdvertised ? '🎉 Advertised' : 'Not Advertised'}
-                    </span>
+                  {/* প্রাইস ও অ্যাড স্ট্যাটাস গ্রিড */}
+                  <div className="grid grid-cols-2 gap-2 pt-3 border-t border-gray-50 dark:border-neutral-800/40 text-xs">
+                    <div>
+                      <p className="text-gray-400 font-medium">Price</p>
+                      <p className={`font-extrabold text-blue-600 dark:text-blue-400 text-sm mt-0.5`}>৳{ticket.price}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-gray-400 font-medium mb-1">Ad Status</p>
+                      <span 
+                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide inline-block
+                          ${ticket.isAdvertised ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400' : 'bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-neutral-400'}`}
+                      >
+                        {ticket.isAdvertised ? '🎉 Advertised' : 'Not Advertised'}
+                      </span>
+                    </div>
                   </div>
                 </div>
 
                 {/* ভেন্ডর ইনফো ও অ্যাকশন বাটন */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-gray-50 dark:border-neutral-800/40">
-                  <div className="bg-gray-50/50 dark:bg-neutral-800/20 p-2.5 rounded-xl">
+                  <div className="bg-gray-50/50 dark:bg-neutral-800/20 p-2.5 rounded-xl flex-1 min-w-0">
                     <p className="text-[10px] text-purple-500 font-bold uppercase tracking-wider">Vendor</p>
-                    <p className={`font-semibold text-xs mt-0.5 ${text}`}>{ticket.vendorName}</p>
-                    <p className={`${muted} text-[11px] truncate max-w-[200px]`}>{ticket.vendorEmail}</p>
+                    <p className={`font-semibold text-xs mt-0.5 truncate ${text}`}>{ticket.vendorName}</p>
+                    <p className={`${muted} text-[11px] truncate`}>{ticket.vendorEmail}</p>
                   </div>
 
-                  {/* মোবাইল টগল বাটন */}
-                  <div className="flex justify-end shrink-0">
+                  {/* মোবাইল ও ট্যাবলেট টগল বাটন */}
+                  <div className="flex justify-end shrink-0 w-full sm:w-auto">
                     <button
                       disabled={loadingId !== null}
                       onClick={() => handleAdvertiseToggle(ticket._id, ticket.isAdvertised)}
-                      className={`font-bold text-xs px-4 py-2.5 rounded-xl transition-all active:scale-95 shadow-sm text-white
+                      className={`w-full sm:w-auto font-bold text-xs px-4 py-2.5 rounded-xl transition-all active:scale-95 shadow-sm text-white
                         ${ticket.isAdvertised ? 'bg-rose-500 hover:bg-rose-600' : 'bg-blue-600 hover:bg-blue-700'} 
                         ${loadingId !== null ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}`}
                     >
@@ -141,8 +157,8 @@ const AdminAdvertiseTicketsPage = () => {
             ))}
           </div>
 
-          {/* 💻 ডেস্কটপ ভিউ (Premium Table Layout) - 'md' এবং বড় স্ক্রিনের জন্য */}
-          <div className={`${card} hidden md:block overflow-x-auto shadow-md rounded-2xl border border-gray-100 dark:border-neutral-800 bg-white dark:bg-neutral-900`}>
+          {/* 💻 ডেস্কটপ ভিউ (Premium Table Layout) - শুধুমাত্র 'lg' এবং তার বড় স্ক্রিনের জন্য */}
+          <div className={`${card} hidden lg:block overflow-x-auto shadow-md rounded-2xl border border-gray-100 dark:border-neutral-800 bg-white dark:bg-neutral-900`}>
             <table className="w-full border-collapse text-left">
               <thead>
                 <tr className="bg-gray-50/70 dark:bg-neutral-950 border-b border-gray-100 dark:border-neutral-800 text-xs uppercase tracking-wider font-bold text-gray-600 dark:text-neutral-400">
@@ -195,7 +211,7 @@ const AdminAdvertiseTicketsPage = () => {
                     {/* Advertisement Current Status Badge */}
                     <td className="p-4">
                       <span 
-                        className={`px-3 py-1 rounded-full text-xs font-semibold tracking-wide
+                        className={`px-3 py-1 rounded-full text-xs font-semibold tracking-wide inline-block
                           ${ticket.isAdvertised ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400' : 'bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-neutral-400'}`}
                       >
                         {ticket.isAdvertised ? '🎉 Advertised' : 'Not Advertised'}

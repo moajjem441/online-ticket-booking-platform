@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { card, text, title, muted } from "@/styles/ui";
 import toast from 'react-hot-toast';
 
+
 const AdminTicketManagePage = () => {
   const router = useRouter();
   const [tickets, setTickets] = useState([]);
@@ -12,11 +13,16 @@ const AdminTicketManagePage = () => {
 
   const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
 
-  // সব টিকিট লোড করার ফাংশন
+  
+
+ 
   const fetchTickets = async () => {
     try {
-      const res = await fetch(`${serverUrl}/admin/all-tickets`, { cache: 'no-store' });
-      if (res.ok) {
+         const res = await fetch(`${serverUrl}/all-tickets`, {
+           cache: 'no-store'
+         });
+
+          if (res.ok) {
         const data = await res.json();
         setTickets(data);
       }

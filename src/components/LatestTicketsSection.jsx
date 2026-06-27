@@ -4,16 +4,24 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { card, text, title, muted } from "@/styles/ui";
 
+
+
 const LatestTicketsSection = () => {
   const router = useRouter();
   const [latestTickets, setLatestTickets] = useState([]);
   const [loading, setLoading] = useState(true);
   const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
 
+
+
+
   useEffect(() => {
     const fetchLatestTickets = async () => {
       try {
-        const res = await fetch(`${serverUrl}/admin/all-tickets`, { cache: 'no-store' });
+      
+        const res = await fetch(`${serverUrl}/all-tickets`, {
+          cache: 'no-store'
+        });
         if (res.ok) {
           const data = await res.json();
           const sortedLatest = [...data].reverse().slice(0, 8);
@@ -34,27 +42,27 @@ const LatestTicketsSection = () => {
   return (
     <section className="w-full bg-white dark:bg-[#0d0811] py-12 border-b border-gray-100 dark:border-neutral-900/40 transition-colors duration-300">
       <div className="w-full max-w-7xl mx-auto p-4 md:p-6 space-y-6" style={{ fontFamily: 'sans-serif' }}>
-        
+
         {/* সেকশন হেডার */}
         {/* সেকশন হেডার */}
-<div className="border-b border-gray-100 dark:border-neutral-800 pb-4">
-  <h2 className="text-3xl md:text-5xl font-black tracking-tight text-gray-900 dark:text-white m-0">
-    🆕 Recently Added{" "}
-    <span className="bg-gradient-to-r from-violet-600 via-indigo-500 to-cyan-500 bg-clip-text text-transparent">
-      Tickets
-    </span>
-  </h2>
-  <p className={`${muted} text-sm md:text-base m-0 mt-1 font-light`}>Explore the latest available travel tickets listed just now</p>
-</div>
+        <div className="border-b border-gray-100 dark:border-neutral-800 pb-4">
+          <h2 className="text-3xl md:text-5xl font-black tracking-tight text-gray-900 dark:text-white m-0">
+            🆕 Recently Added{" "}
+            <span className="bg-gradient-to-r from-violet-600 via-indigo-500 to-cyan-500 bg-clip-text text-transparent">
+              Tickets
+            </span>
+          </h2>
+          <p className={`${muted} text-sm md:text-base m-0 mt-1 font-light`}>Explore the latest available travel tickets listed just now</p>
+        </div>
 
         {/* রেসপন্সিভ কার্ড গ্রিড লেআউট */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {latestTickets.map((ticket) => (
-            <div 
-              key={ticket._id} 
+            <div
+              key={ticket._id}
               className={`${card} flex flex-col justify-between overflow-hidden shadow-sm hover:shadow-md transition-all rounded-xl border border-gray-100 dark:border-neutral-800 bg-white dark:bg-neutral-900`}
             >
-              
+
               {/* ১. ইমেজ ও ট্রান্সপোর্ট টাইপ ব্যাজ */}
               <div className="relative h-44 w-full bg-gray-100 dark:bg-neutral-800">
                 {ticket.image ? (
@@ -71,13 +79,13 @@ const LatestTicketsSection = () => {
 
               {/* কার্ড বডি কন্টেন্ট */}
               <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
-                
+
                 <div className="space-y-1.5">
                   {/* ২. টিকিট টাইটেল */}
                   <h3 className={`${title} text-base font-bold line-clamp-1 m-0 text-gray-900 dark:text-white`}>
                     {ticket.title}
                   </h3>
-                  
+
                   {/* রুট */}
                   <p className="text-xs text-gray-400 m-0">
                     {ticket.fromLocation} ➔ {ticket.toLocation}
